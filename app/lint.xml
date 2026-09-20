@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!--
+        Suppressions here are narrow and each has a reason. Blanket ignores are
+        not used: lint is expected to stay clean apart from these.
+    -->
+
+    <!-- Persian-first locale; see the lint {} block in build.gradle.kts. -->
+    <issue id="MissingTranslation" severity="ignore" />
+
+    <!--
+        UnusedResources fires on strings that are only reachable through
+        resource-name construction and on the values-en/values-fa override
+        files, which by construction duplicate a subset of keys. Not worth
+        deleting real UI strings over.
+    -->
+    <issue id="UnusedResources" severity="informational" />
+
+    <!-- Dependency currency is tracked deliberately, not by lint. -->
+    <issue id="NewerVersionAvailable" severity="ignore" />
+    <issue id="GradleDependency" severity="ignore" />
+    <issue id="AndroidGradlePluginVersion" severity="ignore" />
+
+    <!-- targetSdk 36 is the latest stable; 37 is compile-only. -->
+    <issue id="OldTargetApi" severity="ignore" />
+</lint>

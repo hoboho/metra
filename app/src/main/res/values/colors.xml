@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="metra_background">#FFFBFE</color>
+    <color name="metra_background_dark">#111418</color>
+    <color name="ic_launcher_background">#082218</color>
+</resources>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!--
+        Android's own backup carries the database and DataStore so a device
+        migration does not lose work records.
+
+        Generated reports, safety snapshots and receipt attachments are
+        deliberately NOT included: nothing under domain="file" is included
+        except datastore/, so there is nothing to exclude. Adding <exclude>
+        entries for them would be dead rules (lint flags this as
+        FullBackupContent).
+    -->
+    <include domain="database" path="." />
+    <include domain="sharedpref" path="." />
+    <include domain="file" path="datastore/" />
+</full-backup-content>

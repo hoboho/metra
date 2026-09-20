@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Generated reports (PDF / CSV / JSON) shared through the share sheet. -->
+    <cache-path name="reports" path="reports/" />
+    <files-path name="internal_reports" path="reports/" />
+    <external-files-path name="external_reports" path="reports/" />
+    <cache-path name="backups" path="backups/" />
+</paths>

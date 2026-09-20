@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Default locale is Persian, so the launcher label is the Persian form.
+        values-en overrides it. This entry must exist in the default locale or
+        lint (correctly) reports ExtraTranslation.
+    -->
+    <string name="app_name">مترا</string>
+    <string name="app_name_latin">METRA</string>
+    <string name="app_subtitle">Work &amp; Earnings Tracker</string>
+
+    <!-- Generic -->
+    <string name="action_save">ذخیره</string>
+    <string name="action_cancel">انصراف</string>
+    <string name="action_delete">حذف</string>
+    <string name="action_edit">ویرایش</string>
+    <string name="action_duplicate">کپی روز کاری</string>
+    <string name="action_add">افزودن</string>
+    <string name="action_close">بستن</string>
+    <string name="action_retry">تلاش دوباره</string>
+    <string name="action_apply">اعمال</string>
+    <string name="action_reset">بازنشانی</string>
+    <string name="action_share">اشتراک‌گذاری</string>
+    <string name="action_confirm">تأیید</string>
+    <string name="action_back">بازگشت</string>
+    <string name="action_search">جستجو</string>
+    <string name="action_clear">پاک کردن</string>
+    <string name="optional_label">اختیاری</string>
+    <string name="value_not_set">—</string>
+    <string name="toman">تومان</string>
+    <string name="meter">متر</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_dashboard">خانه</string>
+    <string name="nav_worklog">کارکرد</string>
+    <string name="nav_reports">گزارش‌ها</string>
+    <string name="nav_statistics">آمار</string>
+    <string name="nav_settings">تنظیمات</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_greeting">سلام %1$s</string>
+    <string name="dashboard_greeting_default">سلام</string>
+    <string name="dashboard_today">امروز</string>
+    <string name="dashboard_today_empty">برای امروز هنوز کارکردی ثبت نشده است</string>
+    <string name="dashboard_this_month">ماه جاری</string>
+    <string name="dashboard_best_day">بهترین روز ماه</string>
+    <string name="dashboard_quick_add">ثبت کارکرد امروز</string>
+    <string name="dashboard_quick_report">گزارش ماهانه</string>
+    <string name="dashboard_total_meters">مجموع کارکرد</string>
+    <string name="dashboard_average_meters">میانگین کارکرد روزانه</string>
+    <string name="dashboard_workdays">روزهای کاری</string>
+    <string name="dashboard_additional_meters">مجموع متراژ مازاد</string>
+    <string name="dashboard_additional_payment">مبلغ متراژ مازاد</string>
+    <string name="dashboard_receivables">مطالبات</string>
+    <string name="dashboard_receivables_hint">مبلغی که شرکت باید به شما بپردازد</string>
+    <string name="dashboard_collected">دریافت‌شده</string>
+    <string name="dashboard_outstanding">باقی‌مانده از شرکت</string>
+    <string name="dashboard_outstanding_hint">جمع مطالبات منهای رسیدهای دریافت ثبت‌شده</string>
+    <string name="dashboard_total_expenses">هزینه‌های قابل مطالبه</string>
+    <string name="dashboard_total_income">جمع مطالبات</string>
+    <string name="dashboard_calculated_by_metra">محاسبهٔ مترا</string>
+    <string name="dashboard_empty_hint">با ثبت اولین روز کاری شروع کنید.</string>
+
+    <!-- Work log -->
+    <string name="worklog_title">کارکرد</string>
+    <string name="worklog_empty">رکوردی در این بازه ثبت نشده است</string>
+    <string name="worklog_filters">فیلترها</string>
+    <string name="worklog_filter_date_range">بازهٔ تاریخ</string>
+    <string name="worklog_filter_project">پروژه</string>
+    <string name="worklog_filter_employer">کارفرما</string>
+    <string name="worklog_filter_supervisor">ناظر</string>
+    <string name="worklog_filter_work_area">محدوده</string>
+    <string name="worklog_filter_min_meters">حداقل کارکرد</string>
+    <string name="worklog_filter_max_meters">حداکثر کارکرد</string>
+    <string name="worklog_filter_only_additional">فقط روزهای دارای مازاد</string>
+    <string name="worklog_filter_only_expenses">فقط روزهای دارای هزینه</string>
+    <string name="worklog_sort">مرتب‌سازی</string>
+    <string name="worklog_sort_date_desc">جدیدترین</string>
+    <string name="worklog_sort_date_asc">قدیمی‌ترین</string>
+    <string name="worklog_sort_meters_desc">بیشترین کارکرد</string>
+    <string name="worklog_sort_meters_asc">کمترین کارکرد</string>
+    <string name="worklog_sort_payment_desc">بیشترین مبلغ مازاد</string>
+    <string name="worklog_sort_expenses_desc">بیشترین هزینه</string>
+    <string name="worklog_view_list">نمایش فهرستی</string>
+    <string name="worklog_view_calendar">نمایش تقویمی</string>
+    <string name="worklog_delete_title">حذف رکورد کارکرد؟</string>
+    <string name="worklog_delete_message">این روز کاری از فهرست خارج می‌شود. هزینه‌های آن نیز حذف خواهند شد.</string>
+    <string name="worklog_deleted">رکورد حذف شد</string>
+    <string name="worklog_search_hint">جستجو در پروژه، کارفرما، ناظر، یادداشت…</string>
+    <string name="worklog_filters_active">فیلتر فعال</string>
+
+    <!-- Work editor -->
+    <string name="editor_new_title">ثبت کارکرد</string>
+    <string name="editor_edit_title">ویرایش کارکرد</string>
+    <string name="editor_section_day">اطلاعات روز</string>
+    <string name="editor_section_work">کارکرد</string>
+    <string name="editor_section_expenses">هزینه‌ها</string>
+    <string name="editor_section_notes">یادداشت</string>
+    <string name="editor_section_time">زمان کار</string>
+
+    <string name="field_date">تاریخ</string>
+    <string name="field_project">پروژه</string>
+    <string name="field_work_area">محدوده انجام کار</string>
+    <string name="field_employer">کارفرما</string>
+    <string name="field_supervisor">ناظر</string>
+    <string name="field_worker_count">تعداد کارگر</string>
+    <string name="field_daily_meters">کارکرد روزانه (متر)</string>
+    <string name="field_threshold">حد نصاب (متر)</string>
+    <string name="field_additional_meters">مازاد (متر)</string>
+    <string name="field_rate">نرخ هر متر</string>
+    <string name="field_additional_payment">مبلغ مازاد</string>
+    <string name="field_notes">یادداشت</string>
+    <string name="field_notes_hint">توضیح کوتاه دربارهٔ این روز کاری…</string>
+    <string name="field_start_time">ساعت شروع کار</string>
+    <string name="field_end_time">ساعت پایان کار</string>
+
+    <string name="editor_calc_worked">کارکرد: %1$s متر</string>
+    <string name="editor_calc_threshold">حد نصاب: %1$s متر</string>
+    <string name="editor_calc_additional">مازاد: %1$s متر</string>
+    <string name="editor_calc_rate">نرخ: %1$s تومان</string>
+    <string name="editor_calc_payment">مبلغ مازاد: %1$s تومان</string>
+    <string name="editor_calc_no_additional">کارکرد به حد نصاب نرسیده است؛ مبلغ مازاد صفر است.</string>
+    <string name="editor_calc_exact_threshold">کارکرد دقیقاً برابر حد نصاب است؛ مبلغ مازاد صفر است.</string>
+    <string name="editor_saved">رکورد کارکرد ذخیره شد</string>
+    <string name="editor_expense_total">جمع هزینه‌های این روز: %1$s تومان</string>
+    <string name="editor_add_expense">+ افزودن هزینه</string>
+
+    <!-- Prefill -->
+    <string name="prefill_banner">اطلاعات از روز کاری %1$s کپی شده است. پیش از ذخیره بررسی کنید.</string>
+    <string name="prefill_from_project">مقادیر پیش‌فرض از پروژهٔ «%1$s» گرفته شده است.</string>
+    <string name="prefill_from_both">مقادیر از پروژهٔ «%1$s» و روز کاری %2$s تکمیل شده است.</string>
+    <string name="prefill_toggle">استفاده از اطلاعات روز کاری قبل</string>
+    <string name="prefill_copied_tag">کپی‌شده</string>
+
+    <!-- Expenses -->
+    <string name="expense_title">هزینه‌ها</string>
+    <string name="expense_new">هزینهٔ جدید</string>
+    <string name="expense_edit">ویرایش هزینه</string>
+    <string name="expense_amount">مبلغ (تومان)</string>
+    <string name="expense_category">دسته</string>
+    <string name="expense_description">توضیح</string>
+    <string name="expense_photo">رسید / تصویر</string>
+    <string name="expense_add_photo">افزودن تصویر رسید</string>
+    <string name="expense_empty">هزینه‌ای ثبت نشده است</string>
+    <string name="expense_delete_title">حذف این هزینه؟</string>
+    <string name="expense_cat_transportation">حمل و نقل</string>
+    <string name="expense_cat_food">خورد و خوراک</string>
+    <string name="expense_cat_accommodation">اسکان</string>
+    <string name="expense_cat_materials">مصالح</string>
+    <string name="expense_cat_tools">ابزار</string>
+    <string name="expense_cat_other">سایر</string>
+
+    <!-- Projects -->
+    <string name="projects_title">پروژه‌ها</string>
+    <string name="projects_new">پروژهٔ جدید</string>
+    <string name="projects_edit">ویرایش پروژه</string>
+    <string name="projects_empty">هنوز پروژه‌ای ثبت نشده است</string>
+    <string name="project_name">نام پروژه</string>
+    <string name="project_employer">کارفرما</string>
+    <string name="project_work_area">محدوده انجام کار</string>
+    <string name="project_default_supervisor">ناظر پیش‌فرض</string>
+    <string name="project_default_worker_count">تعداد کارگر پیش‌فرض</string>
+    <string name="project_notes">یادداشت</string>
+    <string name="project_active">فعال</string>
+    <string name="project_inactive">غیرفعال</string>
+    <string name="project_delete_title">حذف پروژه؟</string>
+    <string name="project_delete_message">رکوردهای کارکرد این پروژه حذف نمی‌شوند و اطلاعات ثبت‌شدهٔ آن‌ها حفظ می‌گردد.</string>
+    <string name="project_saved">پروژه ذخیره شد</string>
+    <string name="project_deleted">پروژه حذف شد</string>
+    <string name="project_pick">انتخاب پروژه</string>
+    <string name="project_none">بدون پروژه</string>
+    <string name="project_workdays_count">%1$s روز کاری</string>
+
+    <!-- Reports -->
+    <string name="reports_title">گزارش‌ها</string>
+    <string name="report_type_daily">گزارش روزانه</string>
+    <string name="report_type_monthly">گزارش ماهانه</string>
+    <string name="report_type_range">بازهٔ دلخواه</string>
+    <string name="report_type_project">گزارش پروژه</string>
+    <string name="report_type_yearly">خلاصهٔ سالانه</string>
+    <string name="report_generate_pdf">ایجاد PDF</string>
+    <string name="report_generate_csv">خروجی CSV</string>
+    <string name="report_include_daily_table">شامل جدول جزئیات روزانه</string>
+    <string name="report_include_notes">شامل یادداشت‌ها</string>
+    <string name="report_include_project_breakdown">شامل تفکیک پروژه‌ها</string>
+    <string name="report_include_expense_breakdown">شامل تفکیک هزینه‌ها</string>
+    <string name="report_period">بازهٔ گزارش</string>
+    <string name="report_preparing">در حال آماده‌سازی گزارش…</string>
+    <string name="report_ready">گزارش آمادهٔ اشتراک‌گذاری است</string>
+    <string name="report_summary">خلاصه</string>
+    <string name="report_no_data">در این بازه رکوردی وجود ندارد</string>
+
+    <!-- Statistics -->
+    <string name="statistics_title">آمار</string>
+    <string name="statistics_period_week">هفتهٔ جاری</string>
+    <string name="statistics_period_month">ماه جاری</string>
+    <string name="statistics_period_previous_month">ماه قبل</string>
+    <string name="statistics_period_year">سال جاری</string>
+    <string name="statistics_period_previous_year">سال قبل</string>
+    <string name="statistics_period_custom">بازهٔ دلخواه</string>
+    <string name="statistics_chart_daily_meters">کارکرد روزانه</string>
+    <string name="statistics_chart_monthly_meters">کارکرد ماهانه</string>
+    <string name="statistics_chart_additional_meters">متراژ مازاد</string>
+    <string name="statistics_chart_additional_payment">مبلغ متراژ مازاد</string>
+    <string name="statistics_chart_expenses">هزینه‌ها</string>
+    <string name="statistics_chart_recorded_income">مطالبات</string>
+    <string name="statistics_kpi_average">میانگین کارکرد روزانه</string>
+    <string name="statistics_kpi_max">بیشترین کارکرد روز</string>
+    <string name="statistics_kpi_min">کمترین کارکرد روز</string>
+    <string name="statistics_kpi_total_meters">جمع کارکرد</string>
+    <string name="statistics_kpi_total_additional">جمع متراژ مازاد</string>
+    <string name="statistics_kpi_average_additional">میانگین مازاد روزانه</string>
+    <string name="statistics_kpi_total_expenses">جمع هزینه‌ها</string>
+    <string name="statistics_kpi_average_expense">میانگین هزینهٔ روزانه</string>
+    <string name="statistics_comparison">مقایسهٔ ماه‌ها</string>
+    <string name="statistics_yearly">نمای سالانه</string>
+    <string name="statistics_change">تغییر</string>
+    <string name="statistics_empty">داده‌ای برای این بازه وجود ندارد</string>
+
+    <!-- Settings -->
+    <string name="settings_title">تنظیمات</string>
+    <string name="settings_section_profile">پروفایل</string>
+    <string name="settings_section_payment">قواعد پرداخت</string>
+    <string name="settings_section_defaults">پیش‌فرض‌های کارکرد</string>
+    <string name="settings_section_notifications">اعلان‌ها</string>
+    <string name="settings_section_appearance">ظاهر</string>
+    <string name="settings_section_data">داده‌ها</string>
+    <string name="settings_section_about">درباره</string>
+
+    <string name="settings_full_name">نام و نام خانوادگی</string>
+    <string name="settings_company_name">نام شرکت</string>
+    <string name="settings_employee_code">کد پرسنلی / شناسهٔ پروژه</string>
+    <string name="settings_report_footer">متن انتهای گزارش</string>
+    <string name="settings_threshold">حد نصاب (متر)</string>
+    <string name="settings_rate">نرخ هر متر مازاد (تومان)</string>
+    <string name="settings_rate_effective_date">تاریخ اجرای نرخ</string>
+    <string name="settings_currency">واحد پول</string>
+    <string name="settings_currency_toman">تومان</string>
+    <string name="settings_currency_rial">ریال</string>
+    <string name="settings_currency_warning">تبدیل خودکار ریال و تومان انجام نمی‌شود؛ این انتخاب فقط واحد نمایش است.</string>
+    <string name="settings_rate_saved">قاعدهٔ پرداخت جدید ثبت شد. رکوردهای گذشته تغییر نمی‌کنند.</string>
+    <string name="settings_rate_history">تاریخچهٔ نرخ‌ها</string>
+    <string name="settings_rate_new">ثبت نرخ جدید</string>
+    <string name="settings_default_project">پروژهٔ پیش‌فرض</string>
+    <string name="settings_default_supervisor">ناظر پیش‌فرض</string>
+    <string name="settings_default_worker_count">تعداد کارگر پیش‌فرض</string>
+    <string name="settings_default_work_area">محدودهٔ پیش‌فرض</string>
+    <string name="settings_use_previous_workday">استفاده از اطلاعات روز کاری قبل</string>
+    <string name="settings_reminder_enabled">یادآوری روزانه</string>
+    <string name="settings_reminder_time">ساعت یادآوری</string>
+    <string name="settings_reminder_hint">اگر تا این ساعت کارکردی ثبت نکرده باشید، یک اعلان دریافت می‌کنید.</string>
+    <string name="settings_theme">حالت نمایش</string>
+    <string name="settings_theme_system">پیروی از سیستم</string>
+    <string name="settings_theme_light">روشن</string>
+    <string name="settings_theme_dark">تاریک</string>
+    <string name="settings_backup">تهیهٔ نسخهٔ پشتیبان</string>
+    <string name="settings_backup_encrypted">پشتیبان رمزنگاری‌شده</string>
+    <string name="settings_restore">بازیابی از نسخهٔ پشتیبان</string>
+    <string name="settings_export_csv">خروجی CSV</string>
+    <string name="settings_export_json">خروجی JSON</string>
+    <string name="settings_database_info">اطلاعات پایگاه داده</string>
+    <string name="settings_about_version">نسخهٔ برنامه</string>
+    <string name="settings_about_licenses">مجوزهای متن‌باز</string>
+    <string name="settings_about_privacy">حریم خصوصی</string>
+    <string name="settings_privacy_body">مترا کاملاً آفلاین کار می‌کند. برنامه هیچ دسترسی اینترنتی ندارد، هیچ تحلیل رفتاری جمع‌آوری نمی‌کند و هیچ تبلیغی نمایش نمی‌دهد. تمام داده‌ها فقط روی دستگاه شما ذخیره می‌شوند.</string>
+    <string name="settings_projects">مدیریت پروژه‌ها</string>
+
+    <!-- Database info -->
+    <string name="db_info_title">اطلاعات پایگاه داده</string>
+    <string name="db_info_workdays">روزهای کاری ثبت‌شده</string>
+    <string name="db_info_projects">پروژه‌ها</string>
+    <string name="db_info_expenses">رکوردهای هزینه</string>
+    <string name="db_info_rules">قواعد پرداخت</string>
+    <string name="db_info_backups">عملیات پشتیبان‌گیری</string>
+
+    <!-- Backup / restore -->
+    <string name="backup_passphrase_title">رمز عبور فایل پشتیبان</string>
+    <string name="backup_passphrase_hint">برای رمزنگاری فایل، یک رمز وارد کنید</string>
+    <string name="backup_passphrase_restore_hint">رمز عبور فایل پشتیبان را وارد کنید</string>
+    <string name="backup_exporting">در حال تهیهٔ نسخهٔ پشتیبان…</string>
+    <string name="backup_done">نسخهٔ پشتیبان آماده است</string>
+    <string name="restore_preview_title">بازیابی اطلاعات</string>
+    <string name="restore_preview_message">فایل انتخابی شامل %1$s پروژه، %2$s رکورد کارکرد و %3$s هزینه است. داده‌های فعلی شما: %4$s پروژه و %5$s رکورد کارکرد.</string>
+    <string name="restore_strategy_title">روش بازیابی</string>
+    <string name="restore_strategy_add_only">فقط افزودن موارد جدید (امن)</string>
+    <string name="restore_strategy_merge">ادغام و به‌روزرسانی موارد تکراری</string>
+    <string name="restore_strategy_replace">جایگزینی کامل (حذف داده‌های فعلی)</string>
+    <string name="restore_safety_note">پیش از بازیابی، یک نسخهٔ امن از داده‌های فعلی شما ساخته می‌شود.</string>
+    <string name="restore_done">بازیابی انجام شد</string>
+    <string name="restore_done_detail">%1$s پروژه، %2$s رکورد کارکرد و %3$s هزینه بازیابی شد.</string>
+    <string name="restore_unsupported">این فایل پشتیبان با نسخهٔ فعلی برنامه سازگار نیست.</string>
+
+    <!-- App lock -->
+    <string name="lock_title">مترا قفل است</string>
+    <string name="lock_subtitle">رمز عبور خود را وارد کنید</string>
+    <string name="lock_confirm_pin">تکرار رمز عبور</string>
+    <string name="lock_unlock">باز کردن</string>
+    <string name="lock_wrong_pin">رمز عبور نادرست است</string>
+    <string name="lock_pin_mismatch">رمزها یکسان نیستند</string>
+    <string name="lock_pin_too_short">رمز عبور باید بین ۴ تا ۸ رقم باشد</string>
+    <string name="lock_use_pin">استفاده از رمز عبور</string>
+    <string name="lock_biometric_title">ورود به مترا</string>
+    <string name="lock_biometric_subtitle">برای ادامه احراز هویت کنید</string>
+    <string name="lock_pin_saved">رمز عبور فعال شد</string>
+    <string name="lock_pin_removed">رمز عبور حذف شد</string>
+    <string name="lock_enter_current_pin">رمز عبور فعلی را وارد کنید</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome_title">به مترا خوش آمدید</string>
+    <string name="onboarding_welcome_body">مترا کارکرد روزانه، دریافتی‌ها و هزینه‌های شما را ثبت و گزارش می‌کند. همه‌چیز آفلاین و فقط روی دستگاه شما.</string>
+    <string name="onboarding_profile_title">مشخصات شما</string>
+    <string name="onboarding_profile_body">این اطلاعات در سربرگ گزارش‌ها استفاده می‌شود. بعداً از تنظیمات قابل تغییر است.</string>
+    <string name="onboarding_rules_title">قاعدهٔ پرداخت مازاد</string>
+    <string name="onboarding_rules_body">اگر کارکرد روزانه از حد نصاب بیشتر شود، به ازای هر متر مازاد مبلغی محاسبه می‌شود. این مقادیر بعداً قابل تغییرند.</string>
+    <string name="onboarding_reminder_title">یادآوری روزانه</string>
+    <string name="onboarding_reminder_body">اگر کارکرد امروز را ثبت نکرده باشید، ساعت ۲۰:۰۰ یک یادآوری دریافت می‌کنید. هر زمان می‌توانید خاموشش کنید.</string>
+    <string name="onboarding_next">ادامه</string>
+    <string name="onboarding_finish">شروع به کار</string>
+    <string name="onboarding_skip">رد کردن</string>
+    <string name="onboarding_rule_explainer">مثال: کارکرد ۵۲۰ متر با حد نصاب ۴۰۰ متر یعنی ۱۲۰ متر مازاد.</string>
+
+    <!-- Validation messages -->
+    <string name="error_required_field">این فیلد الزامی است</string>
+    <string name="error_negative_not_allowed">مقدار نمی‌تواند منفی باشد</string>
+    <string name="error_invalid_number">عدد واردشده معتبر نیست</string>
+    <string name="error_end_before_start">ساعت پایان نمی‌تواند پیش از ساعت شروع باشد</string>
+
+    <!-- Notifications -->
+    <string name="reminder_channel_name">یادآوری ثبت کارکرد</string>
+    <string name="reminder_channel_description">یادآوری روزانه برای ثبت کارکرد</string>
+    <string name="reminder_title">کارکرد امروز را ثبت کرده‌اید؟</string>
+    <string name="reminder_body">هنوز رکوردی برای امروز ثبت نشده است. چند ثانیه وقت بگذارید و کارکرد امروز را وارد کنید.</string>
+    <string name="notification_permission_needed">برای فعال‌سازی یادآوری، اجازهٔ اعلان لازم است</string>
+    <string name="notification_permission_grant">دادن اجازه</string>
+
+    <!-- Date picker -->
+    <string name="date_picker_title">انتخاب تاریخ</string>
+    <string name="date_picker_today">امروز</string>
+    <string name="time_picker_title">انتخاب ساعت</string>
+
+    <!-- Charts -->
+    <string name="chart_no_data">داده‌ای برای نمایش نیست</string>
+    <string name="chart_axis_meters">متر</string>
+    <string name="chart_axis_toman">تومان</string>
+
+    <!-- Calendar view -->
+    <string name="calendar_month_navigation_previous">ماه قبل</string>
+    <string name="calendar_month_navigation_next">ماه بعد</string>
+    <string name="calendar_day_has_record">دارای رکورد کارکرد</string>
+    <string name="calendar_day_no_record">بدون رکورد</string>
+
+    <!-- ============================================================ -->
+    <!-- Messages produced by ViewModels (snackbars, banners, errors)  -->
+    <!-- These live in resources so the UI text stays translatable and  -->
+    <!-- no Persian literal is baked into Kotlin.                       -->
+    <!-- ============================================================ -->
+    <string name="msg_record_saved">رکورد کارکرد ذخیره شد</string>
+    <string name="msg_record_deleted">رکورد حذف شد</string>
+    <string name="msg_record_not_found">رکورد یافت نشد</string>
+    <string name="msg_record_duplicated">یک روز کاری جدید از این رکورد ساخته شد</string>
+    <string name="msg_project_deleted">پروژه حذف شد</string>
+    <string name="msg_project_not_found">پروژه یافت نشد</string>
+    <string name="msg_project_name_required">نام پروژه الزامی است</string>
+    <string name="msg_project_duplicate_name">پروژه‌ای با این نام ثبت شده است</string>
+    <string name="msg_report_ready">گزارش آمادهٔ اشتراک‌گذاری است</string>
+    <string name="msg_file_not_found">فایل یافت نشد</string>
+    <string name="msg_backup_ready">نسخهٔ پشتیبان آماده است</string>
+    <string name="msg_backup_failed">تهیهٔ نسخهٔ پشتیبان ناموفق بود</string>
+    <string name="msg_read_file_failed">خواندن فایل ممکن نشد</string>
+    <string name="msg_csv_ready">فایل CSV آماده است</string>
+    <string name="msg_json_ready">فایل JSON آماده است</string>
+    <string name="msg_rule_added">قاعدهٔ پرداخت جدید ثبت شد. رکوردهای گذشته تغییر نمی‌کنند.</string>
+    <string name="msg_values_not_negative">مقادیر نمی‌توانند منفی باشند</string>
+    <string name="msg_expense_amount_positive">مبلغ هزینه باید بزرگ‌تر از صفر باشد</string>
+    <string name="msg_pin_wrong">رمز عبور نادرست است</string>
+    <string name="msg_reminder_enabled">یادآوری روزانه فعال شد</string>
+    <string name="msg_reminder_permission">برای فعال‌سازی یادآوری، اجازهٔ اعلان لازم است</string>
+    <string name="msg_reminder_time_invalid">ساعت یادآوری معتبر نیست</string>
+    <string name="msg_rate_not_negative">نرخ نمی‌تواند منفی باشد</string>
+    <string name="msg_threshold_not_negative">حد نصاب نمی‌تواند منفی باشد</string>
+    <string name="msg_backup_restored">%1$s پروژه، %2$s رکورد کارکرد و %3$s هزینه بازیابی شد.</string>
+
+    <!-- Share sheet subjects -->
+    <string name="share_subject_report">گزارش کارکرد مترا</string>
+    <string name="share_subject_csv">خروجی CSV مترا</string>
+    <string name="share_subject_json">خروجی JSON مترا</string>
+    <string name="share_subject_backup">نسخهٔ پشتیبان مترا</string>
+
+    <!-- Prefill provenance banners -->
+    <string name="prefill_from_project_and_day">مقادیر از پروژهٔ «%1$s» و روز کاری %2$s تکمیل شده است.</string>
+    <string name="prefill_from_previous_day">اطلاعات از روز کاری %1$s کپی شده است. پیش از ذخیره بررسی کنید.</string>
+
+    <!-- Payment calculation explanations -->
+    <string name="calc_meters">کارکرد: %1$s متر</string>
+    <string name="calc_threshold">حد نصاب: %1$s متر</string>
+    <string name="calc_additional">مازاد: %1$s متر</string>
+    <string name="calc_rate">نرخ: %1$s تومان</string>
+    <string name="calc_additional_payment">مبلغ مازاد: %1$s تومان</string>
+    <string name="calc_below_threshold">کارکرد به حد نصاب نرسیده است؛ مبلغ مازاد صفر است.</string>
+    <string name="calc_at_threshold">کارکرد دقیقاً برابر حد نصاب است؛ مبلغ مازاد صفر است.</string>
+
+    <!-- Statistics / report row labels -->
+    <string name="label_total_meters">جمع کارکرد</string>
+    <string name="label_total_additional">جمع مازاد</string>
+    <string name="label_total_additional_payment">جمع مبلغ مازاد</string>
+    <string name="label_total_expenses">جمع هزینه</string>
+    <string name="label_total_recorded_income">جمع مطالبات</string>
+    <string name="label_workdays">روزهای کاری</string>
+    <string name="label_work_record">رکورد کارکرد</string>
+    <string name="label_rule_current">جاری</string>
+    <string name="label_rule_default">قاعدهٔ پیش‌فرض</string>
+    <string name="label_rule_initial">قاعدهٔ اولیه</string>
+    <string name="label_rule_generic">قاعدهٔ پرداخت</string>
+    <string name="label_project">پروژه</string>
+    <string name="unit_meters_suffix">%1$s متر</string>
+    <string name="unit_rate_per_meter">%1$s تومان بر متر</string>
+
+    <!-- Biometric prompt -->
+    <string name="biometric_title">ورود به مترا</string>
+    <string name="biometric_subtitle">برای ادامه احراز هویت کنید</string>
+
+    <!-- Settings hints that were previously inline -->
+    <string name="settings_rate_change_note">تغییر نرخ، رکوردهای گذشته را تغییر نمی‌دهد.</string>
+    <string name="settings_rate_history_note">هر تغییر نرخ به‌صورت یک قاعدهٔ جدید با تاریخ اجرا ثبت می‌شود؛ رکوردهای گذشته تغییر نمی‌کنند.</string>
+
+    <!-- Expense categories -->
+    <string name="expense_category_transportation">حمل و نقل</string>
+    <string name="expense_category_food">خورد و خوراک</string>
+    <string name="expense_category_accommodation">اسکان</string>
+    <string name="expense_category_materials">مصالح</string>
+    <string name="expense_category_tools">ابزار</string>
+    <string name="expense_category_other">سایر</string>
+    <string name="msg_expense_not_negative">مبلغ هزینه نمی‌تواند منفی باشد</string>
+    <string name="label_rule_seeded">قاعدهٔ پیش‌فرض</string>
+    <string name="entity_project">پروژه</string>
+    <string name="entity_work_record">رکورد کارکرد</string>
+    <string name="msg_ledger_amount_invalid">مبلغ باید بیشتر از صفر باشد</string>
+
+    <!--  -  ledger -->
+    <string name="nav_ledger">مطالبات</string>
+    <string name="ledger_title">مطالبات</string>
+    <string name="ledger_subtitle">حسابداری ساده دریافت و پرداخت</string>
+    <string name="ledger_outstanding">باقی‌مانده از شرکت</string>
+    <string name="ledger_total_receivable">کل مطالبات</string>
+    <string name="ledger_collected">دریافت‌شده</string>
+    <string name="ledger_entries">رسیدهای دریافت</string>
+    <string name="ledger_empty">هنوز رسیدی ثبت نشده است. با دکمه + اولین دریافت را ثبت کنید.</string>
+    <string name="ledger_add">ثبت رسید</string>
+    <string name="ledger_edit">ویرایش رسید</string>
+    <string name="ledger_receipt">دریافت از شرکت</string>
+    <string name="ledger_payment">پرداخت شخصی</string>
+    <string name="ledger_kind">نوع عملیات</string>
+    <string name="ledger_amount">مبلغ</string>
+    <string name="ledger_reason">بابت</string>
+    <string name="ledger_reason_metraje">متراژ</string>
+    <string name="ledger_reason_expense">هزینه</string>
+    <string name="ledger_reason_salary">حقوق</string>
+    <string name="ledger_reason_other">سایر</string>
+    <string name="ledger_date">تاریخ</string>
+    <string name="ledger_project">پروژه</string>
+    <string name="ledger_project_all">همه پروژه‌ها</string>
+    <string name="ledger_method">روش دریافت</string>
+    <string name="ledger_method_card">کارت به کارت</string>
+    <string name="ledger_method_cash">نقدی</string>
+    <string name="ledger_method_cheque">چک</string>
+    <string name="ledger_notes">توضیح</string>
+    <string name="ledger_save">ثبت</string>
+    <string name="ledger_delete">حذف رسید</string>
+    <string name="ledger_delete_message">این رسید از دفتر مطالبات حذف می‌شود.</string>
+    <string name="ledger_saved">رسید ثبت شد</string>
+    <string name="ledger_deleted">رسید حذف شد</string>
+    <string name="msg_report_saved">فایل گزارش ذخیره شد</string>
+    <string name="report_save_pdf">ذخیره PDF در فایل</string>
+</resources>

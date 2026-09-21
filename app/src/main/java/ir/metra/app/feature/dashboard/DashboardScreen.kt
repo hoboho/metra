@@ -66,12 +66,12 @@ fun DashboardScreen(
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = androidx.compose.foundation.layout.PaddingValues(
-            start = 16.dp,
-            end = 16.dp,
-            top = 12.dp,
+            start = 20.dp,
+            end = 20.dp,
+            top = 20.dp,
             bottom = 96.dp,
         ),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
             Column {
@@ -209,9 +209,11 @@ fun DashboardScreen(
 private fun TodayCard(today: TodaySummary?, onOpenWorkEditor: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(20.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -267,11 +269,11 @@ private fun ReceivablesHero(
     val scheme = MaterialTheme.colorScheme
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
+        shape = MaterialTheme.shapes.large,
         color = scheme.primary,
-        shadowElevation = 6.dp,
+        shadowElevation = 8.dp,
     ) {
-        Column(modifier = Modifier.padding(18.dp)) {
+        Column(modifier = Modifier.padding(22.dp)) {
             Text(
                 text = stringResource(R.string.dashboard_outstanding),
                 style = MaterialTheme.typography.bodySmall,

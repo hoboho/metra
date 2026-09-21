@@ -28,13 +28,13 @@ import ir.metra.app.R
  * the two categories stay visually distinct everywhere in the app.
  */
 
-private val GreenPrimary = Color(0xFF0F4C3A)
-private val GreenContainer = Color(0xFFB8E6D2)
-private val GreenOnContainer = Color(0xFF00211A)
-private val AmberSecondary = Color(0xFF8A5A00)
-private val AmberContainer = Color(0xFFFFDDB0)
-private val AmberOnContainer = Color(0xFF2C1A00)
-private val RedTertiary = Color(0xFFB3261E)
+private val GreenPrimary = Color(0xFF176B5B)
+private val GreenContainer = Color(0xFFD8F2E9)
+private val GreenOnContainer = Color(0xFF00382E)
+private val AmberSecondary = Color(0xFF8B5E16)
+private val AmberContainer = Color(0xFFFFE8C2)
+private val AmberOnContainer = Color(0xFF2D1C00)
+private val RedTertiary = Color(0xFFB63B35)
 
 private val LightColors = lightColorScheme(
     primary = GreenPrimary,
@@ -47,35 +47,35 @@ private val LightColors = lightColorScheme(
     onSecondaryContainer = AmberOnContainer,
     tertiary = RedTertiary,
     onTertiary = Color.White,
-    background = Color(0xFFFBFDF9),
-    onBackground = Color(0xFF161C19),
-    surface = Color(0xFFFBFDF9),
-    onSurface = Color(0xFF161C19),
-    surfaceVariant = Color(0xFFE1E7E1),
-    onSurfaceVariant = Color(0xFF434945),
-    outline = Color(0xFF737975),
-    outlineVariant = Color(0xFFC3C7C1),
+    background = Color(0xFFF7F9F7),
+    onBackground = Color(0xFF17201D),
+    surface = Color(0xFFFFFEFC),
+    onSurface = Color(0xFF17201D),
+    surfaceVariant = Color(0xFFE4EAE5),
+    onSurfaceVariant = Color(0xFF4B5650),
+    outline = Color(0xFF728078),
+    outlineVariant = Color(0xFFD1D9D3),
 )
 
 private val DarkColors = darkColorScheme(
-    primary = Color(0xFF8FD6B8),
-    onPrimary = Color(0xFF00382B),
-    primaryContainer = Color(0xFF00513F),
-    onPrimaryContainer = GreenContainer,
-    secondary = Color(0xFFF2BE77),
-    onSecondary = Color(0xFF472D00),
-    secondaryContainer = Color(0xFF654100),
+    primary = Color(0xFF9DE1CA),
+    onPrimary = Color(0xFF00382E),
+    primaryContainer = Color(0xFF075443),
+    onPrimaryContainer = Color(0xFFD8F2E9),
+    secondary = Color(0xFFF8C982),
+    onSecondary = Color(0xFF493000),
+    secondaryContainer = Color(0xFF674500),
     onSecondaryContainer = AmberContainer,
     tertiary = Color(0xFFFFB4AB),
     onTertiary = Color(0xFF690005),
-    background = Color(0xFF111412),
-    onBackground = Color(0xFFE1E4E0),
-    surface = Color(0xFF111412),
-    onSurface = Color(0xFFE1E4E0),
-    surfaceVariant = Color(0xFF434945),
-    onSurfaceVariant = Color(0xFFC3C7C1),
-    outline = Color(0xFF8D938D),
-    outlineVariant = Color(0xFF434945),
+    background = Color(0xFF101614),
+    onBackground = Color(0xFFDEE7E1),
+    surface = Color(0xFF171E1B),
+    onSurface = Color(0xFFDEE7E1),
+    surfaceVariant = Color(0xFF414B46),
+    onSurfaceVariant = Color(0xFFC0CAC3),
+    outline = Color(0xFF89958E),
+    outlineVariant = Color(0xFF414B46),
 )
 
 /**
@@ -91,15 +91,15 @@ val VazirmatnFontFamily = FontFamily(
 )
 
 private val MetraTypography = Typography(
-    displayLarge = TextStyle(fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, fontSize = 40.sp, lineHeight = 48.sp),
-    headlineLarge = TextStyle(fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, fontSize = 28.sp, lineHeight = 36.sp),
-    headlineMedium = TextStyle(fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, fontSize = 24.sp, lineHeight = 32.sp),
-    headlineSmall = TextStyle(fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, fontSize = 20.sp, lineHeight = 28.sp),
-    titleLarge = TextStyle(fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, fontSize = 18.sp, lineHeight = 26.sp),
+    displayLarge = TextStyle(fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, fontSize = 40.sp, lineHeight = 50.sp, letterSpacing = (-0.5).sp),
+    headlineLarge = TextStyle(fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, fontSize = 29.sp, lineHeight = 38.sp, letterSpacing = (-0.35).sp),
+    headlineMedium = TextStyle(fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, fontSize = 25.sp, lineHeight = 34.sp, letterSpacing = (-0.25).sp),
+    headlineSmall = TextStyle(fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, fontSize = 21.sp, lineHeight = 30.sp),
+    titleLarge = TextStyle(fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Bold, fontSize = 19.sp, lineHeight = 28.sp),
     titleMedium = TextStyle(fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Medium, fontSize = 16.sp, lineHeight = 24.sp),
     titleSmall = TextStyle(fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Medium, fontSize = 14.sp, lineHeight = 20.sp),
-    bodyLarge = TextStyle(fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Normal, fontSize = 16.sp, lineHeight = 26.sp),
-    bodyMedium = TextStyle(fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Normal, fontSize = 14.sp, lineHeight = 22.sp),
+    bodyLarge = TextStyle(fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Normal, fontSize = 16.sp, lineHeight = 27.sp),
+    bodyMedium = TextStyle(fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Normal, fontSize = 14.sp, lineHeight = 23.sp),
     bodySmall = TextStyle(fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Normal, fontSize = 12.sp, lineHeight = 18.sp),
     labelLarge = TextStyle(fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Medium, fontSize = 14.sp, lineHeight = 20.sp),
     labelMedium = TextStyle(fontFamily = VazirmatnFontFamily, fontWeight = FontWeight.Medium, fontSize = 12.sp, lineHeight = 16.sp),
@@ -112,11 +112,11 @@ private val MetraTypography = Typography(
  * rounds every card, button, chip and field consistently.
  */
 private val MetraShapes = Shapes(
-    extraSmall = RoundedCornerShape(8.dp),
-    small = RoundedCornerShape(12.dp),
-    medium = RoundedCornerShape(16.dp),
-    large = RoundedCornerShape(22.dp),
-    extraLarge = RoundedCornerShape(28.dp),
+    extraSmall = RoundedCornerShape(10.dp),
+    small = RoundedCornerShape(14.dp),
+    medium = RoundedCornerShape(20.dp),
+    large = RoundedCornerShape(26.dp),
+    extraLarge = RoundedCornerShape(32.dp),
 )
 
 /**

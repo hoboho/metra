@@ -126,11 +126,11 @@ private fun OutstandingHero(
     val scheme = MaterialTheme.colorScheme
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
+        shape = MaterialTheme.shapes.large,
         color = scheme.primary,
-        shadowElevation = 6.dp,
+        shadowElevation = 8.dp,
     ) {
-        Column(modifier = Modifier.padding(18.dp)) {
+        Column(modifier = Modifier.padding(22.dp)) {
             Text(
                 text = stringResource(R.string.ledger_outstanding),
                 style = MaterialTheme.typography.bodySmall,
@@ -196,14 +196,15 @@ private fun LedgerRowCard(row: LedgerRow, onClick: () -> Unit) {
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(containerColor = scheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, scheme.outlineVariant.copy(alpha = 0.65f)),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(13.dp),
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(

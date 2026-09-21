@@ -12,7 +12,9 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -224,12 +227,17 @@ fun MetraApp(
     } ?: false
 
     Scaffold(
+        containerColor = androidx.compose.material3.MaterialTheme.colorScheme.background,
         bottomBar = {
             if (currentDestination != null && TopLevelDestination.entries.any { top ->
                     currentDestination.hasRoute(top.route::class)
                 }
             ) {
-                NavigationBar {
+                NavigationBar(
+                    containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surface,
+                    tonalElevation = 3.dp,
+                    windowInsets = NavigationBarDefaults.windowInsets,
+                ) {
                     TopLevelDestination.entries.forEach { destination ->
                         val selected = currentDestination.hasRoute(destination.route::class)
                         NavigationBarItem(
@@ -248,6 +256,13 @@ fun MetraApp(
                                 )
                             },
                             label = { Text(stringResource(destination.labelRes)) },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = androidx.compose.material3.MaterialTheme.colorScheme.onPrimaryContainer,
+                                selectedTextColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                                indicatorColor = androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer,
+                                unselectedIconColor = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
+                                unselectedTextColor = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
+                            ),
                         )
                     }
                 }
@@ -255,7 +270,13 @@ fun MetraApp(
         },
         floatingActionButton = {
             if (showFab) {
-                FloatingActionButton(onClick = onAddWorkday) {
+                FloatingActionButton(
+                    onClick = onAddWorkday,
+                    containerColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+                    contentColor = androidx.compose.material3.MaterialTheme.colorScheme.onPrimary,
+                    shape = androidx.compose.material3.FloatingActionButtonDefaults.shape,
+                    elevation = androidx.compose.material3.FloatingActionButtonDefaults.elevation(defaultElevation = 6.dp),
+                ) {
                     Icon(
                         imageVector = Icons.Filled.Add,
                         contentDescription = stringResource(R.string.dashboard_quick_add),

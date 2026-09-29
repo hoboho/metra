@@ -45,6 +45,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ir.metra.app.R
 import ir.metra.app.data.preferences.ThemeMode
 import ir.metra.app.ui.components.MinuteOfDayPickerDialog
+import ir.metra.app.ui.components.ChoiceChips
 import ir.metra.app.ui.components.SectionCard
 import ir.metra.app.ui.components.StatRow
 import ir.metra.app.ui.components.TagChip
@@ -245,20 +246,17 @@ fun SettingsScreen(
             // ---------------------------------------------------- appearance
             item {
                 SectionCard(title = stringResource(R.string.settings_section_appearance)) {
-                    ThemeRow(
-                        label = stringResource(R.string.settings_theme_system),
-                        selected = state.preferences.themeMode == ThemeMode.SYSTEM,
-                        onClick = { viewModel.onThemeModeChange(ThemeMode.SYSTEM) },
-                    )
-                    ThemeRow(
-                        label = stringResource(R.string.settings_theme_light),
-                        selected = state.preferences.themeMode == ThemeMode.LIGHT,
-                        onClick = { viewModel.onThemeModeChange(ThemeMode.LIGHT) },
-                    )
-                    ThemeRow(
-                        label = stringResource(R.string.settings_theme_dark),
-                        selected = state.preferences.themeMode == ThemeMode.DARK,
-                        onClick = { viewModel.onThemeModeChange(ThemeMode.DARK) },
+                    ChoiceChips(
+                        options = ThemeMode.entries.toList(),
+                        selected = state.preferences.themeMode,
+                        onSelected = { viewModel.onThemeModeChange(it) },
+                        labelOf = { mode ->
+                            when (mode) {
+                                ThemeMode.SYSTEM -> stringResource(R.string.settings_theme_system)
+                                ThemeMode.LIGHT -> stringResource(R.string.settings_theme_light)
+                                ThemeMode.DARK -> stringResource(R.string.settings_theme_dark)
+                            }
+                        },
                     )
                 }
             }

@@ -15,6 +15,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Notes
+import ir.metra.app.ui.components.MetraButton
+import ir.metra.app.ui.components.MetraButtonLevel
+import ir.metra.app.ui.components.MetraTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
@@ -117,21 +126,12 @@ fun WorkEditorScreen(
         },
         bottomBar = {
             Column(modifier = Modifier.padding(16.dp)) {
-                Button(
+                MetraButton(
+                    text = stringResource(R.string.action_save),
                     onClick = { viewModel.save() },
-                    enabled = !state.saving && !state.loading,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    if (state.saving) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.height(18.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.onPrimary,
-                        )
-                    } else {
-                        Text(stringResource(R.string.action_save))
-                    }
-                }
+                    loading = state.saving,
+                    enabled = !state.loading,
+                )
             }
         },
     ) { innerPadding ->
@@ -153,12 +153,12 @@ fun WorkEditorScreen(
 
             // ------------------------------------------------ SECTION 1: day
             SectionCard(title = stringResource(R.string.editor_section_day)) {
-                OutlinedButton(
+                MetraButton(
+                    text = "${stringResource(R.string.field_date)}: ${state.dateLabel}",
                     onClick = { showDatePicker = true },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text("${stringResource(R.string.field_date)}: ${state.dateLabel}")
-                }
+                    level = MetraButtonLevel.Outline,
+                    icon = Icons.Filled.CalendarToday,
+                )
                 Spacer(Modifier.height(8.dp))
 
                 ProjectDropdown(
@@ -169,28 +169,25 @@ fun WorkEditorScreen(
                 )
                 Spacer(Modifier.height(8.dp))
 
-                OutlinedTextField(
+                MetraTextField(
                     value = state.workArea,
                     onValueChange = { viewModel.onFieldChange(WorkEditorViewModel.KEY_WORK_AREA, it) },
-                    label = { Text(stringResource(R.string.field_work_area)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
+                    label = stringResource(R.string.field_work_area),
+                    leadingIcon = Icons.Filled.LocationOn,
                 )
                 Spacer(Modifier.height(8.dp))
-                OutlinedTextField(
+                MetraTextField(
                     value = state.employer,
                     onValueChange = { viewModel.onFieldChange(WorkEditorViewModel.KEY_EMPLOYER, it) },
-                    label = { Text(stringResource(R.string.field_employer)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
+                    label = stringResource(R.string.field_employer),
+                    leadingIcon = Icons.Filled.Business,
                 )
                 Spacer(Modifier.height(8.dp))
-                OutlinedTextField(
+                MetraTextField(
                     value = state.supervisor,
                     onValueChange = { viewModel.onFieldChange(WorkEditorViewModel.KEY_SUPERVISOR, it) },
-                    label = { Text(stringResource(R.string.field_supervisor)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
+                    label = stringResource(R.string.field_supervisor),
+                    leadingIcon = Icons.Filled.Person,
                 )
                 Spacer(Modifier.height(8.dp))
                 MetraNumberField(
@@ -292,47 +289,46 @@ fun WorkEditorScreen(
                     }
                 }
                 Spacer(Modifier.height(8.dp))
-                OutlinedButton(
+                MetraButton(
+                    text = stringResource(R.string.editor_add_expense),
                     onClick = { expenseDialogIndex = -1 },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(stringResource(R.string.editor_add_expense))
-                }
+                    level = MetraButtonLevel.Secondary,
+                    icon = Icons.Filled.Add,
+                )
             }
 
             // -------------------------------------------- SECTION 5: notes
             SectionCard(title = stringResource(R.string.editor_section_notes)) {
-                OutlinedTextField(
+                MetraTextField(
                     value = state.notes,
                     onValueChange = { viewModel.onFieldChange(WorkEditorViewModel.KEY_NOTES, it) },
-                    label = { Text(stringResource(R.string.field_notes)) },
-                    placeholder = { Text(stringResource(R.string.field_notes_hint)) },
+                    label = stringResource(R.string.field_notes),
+                    placeholder = stringResource(R.string.field_notes_hint),
+                    leadingIcon = Icons.Filled.Notes,
+                    singleLine = false,
                     minLines = 3,
-                    modifier = Modifier.fillMaxWidth(),
                 )
             }
 
             // -------------------------------------------- SECTION 6: times
             SectionCard(title = stringResource(R.string.editor_section_time)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(
+                    MetraButton(
+                        text = "${stringResource(R.string.field_start_time)}: " + dateFormatter.formatTime(state.workStartMinuteOfDay),
                         onClick = { showStartPicker = true },
+                        level = MetraButtonLevel.Outline,
+                        icon = Icons.Filled.Schedule,
+                        fullWidth = false,
                         modifier = Modifier.weight(1f),
-                    ) {
-                        Text(
-                            "${stringResource(R.string.field_start_time)}: " +
-                                dateFormatter.formatTime(state.workStartMinuteOfDay),
-                        )
-                    }
-                    OutlinedButton(
+                    )
+                    MetraButton(
+                        text = "${stringResource(R.string.field_end_time)}: " + dateFormatter.formatTime(state.workEndMinuteOfDay),
                         onClick = { showEndPicker = true },
+                        level = MetraButtonLevel.Outline,
+                        icon = Icons.Filled.Schedule,
+                        fullWidth = false,
                         modifier = Modifier.weight(1f),
-                    ) {
-                        Text(
-                            "${stringResource(R.string.field_end_time)}: " +
-                                dateFormatter.formatTime(state.workEndMinuteOfDay),
-                        )
-                    }
+                    )
                 }
             }
 

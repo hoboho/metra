@@ -139,6 +139,7 @@ fun MetraTextField(
     enabled: Boolean = true,
     readOnly: Boolean = false,
     singleLine: Boolean = true,
+    minLines: Int = 1,
     keyboardType: KeyboardType = KeyboardType.Text,
 ) {
     OutlinedTextField(
@@ -153,6 +154,7 @@ fun MetraTextField(
         enabled = enabled,
         readOnly = readOnly,
         singleLine = singleLine,
+        minLines = minLines,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         shape = MaterialTheme.shapes.medium,
         colors = OutlinedTextFieldDefaults.colors(

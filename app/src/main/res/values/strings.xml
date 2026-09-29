@@ -476,4 +476,8 @@
     <string name="report_generate_excel">خروجی Excel</string>
     <string name="msg_xlsx_ready">فایل Excel آماده است</string>
     <string name="share_subject_xlsx">خروجی Excel مترا</string>
+    <string name="widget_label">مترا — متر امروز</string>
+    <string name="settings_section_update">به‌روزرسانی</string>
+    <string name="settings_check_update">بررسی نسخهٔ جدید</string>
+    <string name="settings_update_note">نسخهٔ فعلی: %1$s. با زدن دکمه، صفحهٔ Releases در مرورگر باز می‌شود تا آخرین نسخه را دانلود و نصب کنید.</string>
 </resources>

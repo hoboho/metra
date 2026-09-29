@@ -16,6 +16,10 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.ui.platform.LocalContext
+import ir.metra.app.BuildConfig
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -133,6 +137,31 @@ fun SettingsScreen(
                     }
                     Text(
                         text = stringResource(R.string.settings_rate_change_note),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+
+            // ------------------------------------------------- update
+            item {
+                SectionCard(title = stringResource(R.string.settings_section_update)) {
+                    val context = LocalContext.current
+                    OutlinedButton(
+                        onClick = {
+                            context.startActivity(
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("https://github.com/hoboho/metra/releases/latest"),
+                                ),
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(stringResource(R.string.settings_check_update))
+                    }
+                    Text(
+                        text = stringResource(R.string.settings_update_note, BuildConfig.VERSION_NAME),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

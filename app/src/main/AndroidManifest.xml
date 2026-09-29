@@ -72,6 +72,18 @@
             android:exported="false"
             tools:node="remove"
             tools:ignore="MissingClass" />
+        <receiver
+            android:name=".feature.widget.MetraWidgetReceiver"
+            android:exported="true"
+            android:label="@string/widget_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/metra_widget_info" />
+        </receiver>
+
     </application>
 
     <queries>

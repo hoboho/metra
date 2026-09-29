@@ -18,8 +18,8 @@ android {
         applicationId = "ir.metra.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.0.1"
+        versionCode = 3
+        versionName = "1.4.0"
 
         testInstrumentationRunner = "ir.metra.app.testing.HiltTestRunner"
 
@@ -172,6 +172,10 @@ dependencies {
     // Background work / security
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.biometric)
+
+    // Glance home-screen widget (M-10)
+    implementation("androidx.glance:glance-appwidget:1.1.1")
+    implementation("androidx.glance:glance-material3:1.1.1")
 
     // Serialization / coroutines / Jalali calendar
     implementation(libs.kotlinx.serialization.json)

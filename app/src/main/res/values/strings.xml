@@ -485,4 +485,6 @@
     <string name="expense_change_photo">تغییر تصویر</string>
     <string name="expense_remove_photo">حذف تصویر</string>
     <string name="expense_delete">حذف هزینه</string>
+    <string name="expense_context_format">برای %1$s — %2$s</string>
+    <string name="expense_day_total">جمع هزینهٔ این روز</string>
 </resources>

@@ -21,6 +21,11 @@ import androidx.compose.material.icons.filled.Image
 import ir.metra.app.ui.components.ChoiceChips
 import ir.metra.app.ui.components.MetraButton
 import ir.metra.app.ui.components.MetraButtonLevel
+import androidx.compose.foundation.Image
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import ir.metra.app.ui.components.StatRow
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
@@ -104,7 +109,14 @@ fun ExpenseEditorScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            SectionCard(title = stringResource(R.string.expense_title)) {
+            SectionCard(
+                title = stringResource(R.string.expense_title),
+                subtitle = if (state.projectName.isNotEmpty()) {
+                    stringResource(R.string.expense_context_format, state.workDateLabel, state.projectName)
+                } else {
+                    null
+                },
+            ) {
                 MetraNumberField(
                     value = state.amount,
                     onValueChange = { viewModel.onAmountChange(it) },
@@ -136,6 +148,21 @@ fun ExpenseEditorScreen(
                 )
                 Spacer(Modifier.height(8.dp))
                 if (state.receiptPhotoPath != null) {
+                    val bmp = remember(state.receiptPhotoPath) {
+                        android.graphics.BitmapFactory.decodeFile(state.receiptPhotoPath)
+                    }
+                    if (bmp != null) {
+                        Image(
+                            bitmap = bmp.asImageBitmap(),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(180.dp)
+                                .clip(MaterialTheme.shapes.medium),
+                        )
+                        Spacer(Modifier.height(8.dp))
+                    }
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         MetraButton(
                             text = stringResource(R.string.expense_change_photo),
@@ -165,6 +192,9 @@ fun ExpenseEditorScreen(
                         level = MetraButtonLevel.Secondary,
                         icon = Icons.Filled.Image,
                     )
+                }
+                if (state.dayExpenseTotalLabel.isNotEmpty()) {
+                    StatRow(stringResource(R.string.expense_day_total), state.dayExpenseTotalLabel)
                 }
             }
             MetraButton(

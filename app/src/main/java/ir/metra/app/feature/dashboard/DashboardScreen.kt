@@ -38,6 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ir.metra.app.R
+import ir.metra.app.ui.components.MetraButton
+import ir.metra.app.ui.components.MetraButtonLevel
 import ir.metra.app.ui.components.SectionCard
 import ir.metra.app.ui.components.StatRow
 import ir.metra.app.ui.components.TagChip
@@ -93,16 +95,21 @@ fun DashboardScreen(
 
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = onOpenWorkEditor, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Filled.Add, contentDescription = null)
-                    Spacer(Modifier.width(6.dp))
-                    Text(stringResource(R.string.dashboard_quick_add))
-                }
-                FilledTonalButton(onClick = onOpenReports, modifier = Modifier.weight(1f)) {
-                    Icon(Icons.Filled.InsertDriveFile, contentDescription = null)
-                    Spacer(Modifier.width(6.dp))
-                    Text(stringResource(R.string.dashboard_quick_report))
-                }
+                MetraButton(
+                    text = stringResource(R.string.dashboard_quick_add),
+                    onClick = onOpenWorkEditor,
+                    icon = Icons.Filled.Add,
+                    fullWidth = false,
+                    modifier = Modifier.weight(1f),
+                )
+                MetraButton(
+                    text = stringResource(R.string.dashboard_quick_report),
+                    onClick = onOpenReports,
+                    level = MetraButtonLevel.Secondary,
+                    icon = Icons.Filled.InsertDriveFile,
+                    fullWidth = false,
+                    modifier = Modifier.weight(1f),
+                )
             }
         }
 
@@ -194,12 +201,20 @@ fun DashboardScreen(
 
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilledTonalButton(onClick = onOpenWorkLog, modifier = Modifier.weight(1f)) {
-                    Text(stringResource(R.string.nav_worklog))
-                }
-                FilledTonalButton(onClick = onOpenStatistics, modifier = Modifier.weight(1f)) {
-                    Text(stringResource(R.string.nav_statistics))
-                }
+                MetraButton(
+                    text = stringResource(R.string.nav_worklog),
+                    onClick = onOpenWorkLog,
+                    level = MetraButtonLevel.Secondary,
+                    fullWidth = false,
+                    modifier = Modifier.weight(1f),
+                )
+                MetraButton(
+                    text = stringResource(R.string.nav_statistics),
+                    onClick = onOpenStatistics,
+                    level = MetraButtonLevel.Secondary,
+                    fullWidth = false,
+                    modifier = Modifier.weight(1f),
+                )
             }
         }
     }
@@ -234,9 +249,12 @@ private fun TodayCard(today: TodaySummary?, onOpenWorkEditor: () -> Unit) {
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
                 Spacer(Modifier.height(12.dp))
-                Button(onClick = onOpenWorkEditor) {
-                    Text(stringResource(R.string.dashboard_quick_add))
-                }
+                MetraButton(
+                    text = stringResource(R.string.dashboard_quick_add),
+                    onClick = onOpenWorkEditor,
+                    icon = Icons.Filled.Add,
+                    fullWidth = false,
+                )
             } else {
                 StatRow(
                     label = stringResource(R.string.field_daily_meters),

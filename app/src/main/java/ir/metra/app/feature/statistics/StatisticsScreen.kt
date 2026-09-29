@@ -13,6 +13,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Assessment
+import ir.metra.app.ui.components.MetraButton
+import ir.metra.app.ui.components.MetraButtonLevel
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -69,12 +74,22 @@ fun StatisticsScreen(
             if (state.period == StatisticsPeriod.CUSTOM) {
                 item {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        OutlinedButton(onClick = { showStartPicker = true }, modifier = Modifier.weight(1f)) {
-                            Text(state.rangeLabel.substringBefore(" - "))
-                        }
-                        OutlinedButton(onClick = { showEndPicker = true }, modifier = Modifier.weight(1f)) {
-                            Text(state.rangeLabel.substringAfter(" - "))
-                        }
+                        MetraButton(
+                            text = state.rangeLabel.substringBefore(" - "),
+                            onClick = { showStartPicker = true },
+                            level = MetraButtonLevel.Outline,
+                            icon = Icons.Filled.CalendarToday,
+                            fullWidth = false,
+                            modifier = Modifier.weight(1f),
+                        )
+                        MetraButton(
+                            text = state.rangeLabel.substringAfter(" - "),
+                            onClick = { showEndPicker = true },
+                            level = MetraButtonLevel.Outline,
+                            icon = Icons.Filled.CalendarToday,
+                            fullWidth = false,
+                            modifier = Modifier.weight(1f),
+                        )
                     }
                 }
             }
@@ -186,9 +201,12 @@ fun StatisticsScreen(
             }
 
             item {
-                OutlinedButton(onClick = onOpenYearlyOverview, modifier = Modifier.fillMaxWidth()) {
-                    Text(stringResource(R.string.statistics_yearly))
-                }
+                MetraButton(
+                    text = stringResource(R.string.statistics_yearly),
+                    onClick = onOpenYearlyOverview,
+                    level = MetraButtonLevel.Secondary,
+                    icon = Icons.Filled.Assessment,
+                )
             }
         }
     }

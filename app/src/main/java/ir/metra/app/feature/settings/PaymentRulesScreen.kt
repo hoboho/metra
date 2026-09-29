@@ -10,6 +10,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarToday
+import ir.metra.app.ui.components.MetraButton
+import ir.metra.app.ui.components.MetraButtonLevel
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -90,9 +95,11 @@ fun PaymentRulesScreen(
                 }
             }
             item {
-                Button(onClick = { showNewRule = true }, modifier = Modifier.fillMaxWidth()) {
-                    Text(stringResource(R.string.settings_rate_new))
-                }
+                MetraButton(
+                    text = stringResource(R.string.settings_rate_new),
+                    onClick = { showNewRule = true },
+                    icon = Icons.Filled.Add,
+                )
             }
         }
     }
@@ -158,9 +165,12 @@ private fun NewRuleDialog(
                     suffix = stringResource(R.string.toman),
                 )
                 Spacer(Modifier.height(8.dp))
-                OutlinedButton(onClick = { showDatePicker = true }, modifier = Modifier.fillMaxWidth()) {
-                    Text("${stringResource(R.string.settings_rate_effective_date)}: ${dateFormatter.formatLong(epochDay)}")
-                }
+                MetraButton(
+                    text = "${stringResource(R.string.settings_rate_effective_date)}: ${dateFormatter.formatLong(epochDay)}",
+                    onClick = { showDatePicker = true },
+                    level = MetraButtonLevel.Outline,
+                    icon = Icons.Filled.CalendarToday,
+                )
             }
         },
     )

@@ -138,6 +138,9 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.documentfile)
 
+    // Excel (.xlsx) export
+    implementation("org.dhatim:fastexcel:0.20.2")
+
     // Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)

@@ -25,7 +25,7 @@ import androidx.room.TypeConverters
         LedgerEntryEntity::class,
 
     ],
-    version = 1,
+    version = 2,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)

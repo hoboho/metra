@@ -234,12 +234,15 @@ class BackupManager @Inject constructor(
             }
         }
 
-        // 3. Projects, keyed by name so work records can be relinked.
-        val existingProjectsByName = projectRepository.getProjects().associateBy { it.name }
+        // 3. Projects. Prefer the stable uuid (survives renames); fall back to
+        // name for v1 backups that predate the uuid column.
+        val existingProjects = projectRepository.getProjects()
+        val existingProjectsByUuid = existingProjects.associateBy { it.uuid }
+        val existingProjectsByName = existingProjects.associateBy { it.name }
         val projectNameToId = HashMap<String, Long>()
         var projectsImported = 0
         for (dto in payload.projects) {
-            val existing = existingProjectsByName[dto.name]
+            val existing = existingProjectsByUuid[dto.uuid] ?: existingProjectsByName[dto.name]
             if (existing != null) {
                 projectNameToId[dto.name] = existing.id
                 if (strategy == RestoreStrategy.MERGE) {
@@ -259,6 +262,7 @@ class BackupManager @Inject constructor(
             }
             val id = projectRepository.upsert(
                 Project(
+                    uuid = dto.uuid,
                     name = dto.name,
                     employer = dto.employer,
                     workArea = dto.workArea,

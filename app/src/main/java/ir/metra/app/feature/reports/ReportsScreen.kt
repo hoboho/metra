@@ -239,6 +239,15 @@ fun ReportsScreen(
                 Spacer(Modifier.padding(4.dp))
                 Text(stringResource(R.string.report_generate_csv))
             }
+            OutlinedButton(
+                onClick = { viewModel.generateAndShareXlsx() },
+                enabled = !state.working,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Icon(Icons.Filled.TableChart, contentDescription = null)
+                Spacer(Modifier.padding(4.dp))
+                Text(stringResource(R.string.report_generate_excel))
+            }
         }
     }
 

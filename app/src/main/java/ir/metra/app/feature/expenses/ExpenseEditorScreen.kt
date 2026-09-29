@@ -11,6 +11,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
@@ -52,6 +56,11 @@ fun ExpenseEditorScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     var expanded by remember { mutableStateOf(false) }
+
+    // Copies into app storage on pick; see ReceiptPhotoStore.
+    val pickPhoto = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+    ) { uri -> if (uri != null) viewModel.attachPhoto(uri) }
 
     LaunchedEffect(workRecordId, expenseId) { viewModel.load(workRecordId, expenseId) }
     LaunchedEffect(state.saved) {
@@ -130,6 +139,23 @@ fun ExpenseEditorScreen(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
+                Spacer(Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = {
+                        pickPhoto.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(
+                        if (state.receiptPhotoPath != null) {
+                            stringResource(R.string.expense_photo_attached)
+                        } else {
+                            stringResource(R.string.expense_attach_photo)
+                        },
+                    )
+                }
             }
             Button(
                 onClick = { viewModel.save() },

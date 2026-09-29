@@ -99,6 +99,7 @@ data class PaymentRuleDto(
 
 @Serializable
 data class ProjectDto(
+    val uuid: String = "",
     val name: String,
     val employer: String = "",
     val workArea: String = "",
@@ -172,6 +173,7 @@ fun PaymentRule.toDto() = PaymentRuleDto(
 )
 
 fun Project.toDto() = ProjectDto(
+    uuid = uuid,
     name, employer, workArea, defaultSupervisor, defaultWorkerCount, notes, isActive,
     createdAtEpochMilli, updatedAtEpochMilli,
 )

@@ -58,6 +58,7 @@ fun UserProfile.toEntity(nowEpochMilli: Long, createdAtEpochMilli: Long = nowEpo
 
 fun ProjectEntity.toDomain(): Project = Project(
     id = id,
+    uuid = uuid,
     name = name,
     employer = employer,
     workArea = workArea,
@@ -71,6 +72,7 @@ fun ProjectEntity.toDomain(): Project = Project(
 
 fun Project.toEntity(): ProjectEntity = ProjectEntity(
     id = id,
+    uuid = uuid,
     name = name.trim(),
     employer = employer.trim(),
     workArea = workArea.trim(),

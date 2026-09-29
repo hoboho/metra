@@ -69,6 +69,7 @@ class FileSharer @Inject constructor(
     companion object {
         const val MIME_PDF = "application/pdf"
         const val MIME_CSV = "text/csv"
+        const val MIME_XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         const val MIME_JSON = "application/json"
         const val MIME_BACKUP = "application/octet-stream"
     }

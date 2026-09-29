@@ -247,6 +247,25 @@ class ReportsViewModel @Inject constructor(
         }
     }
 
+    /** Excel (.xlsx) export: a native spreadsheet, RTL, with a bold header. */
+    fun generateAndShareXlsx() {
+        viewModelScope.launch {
+            _state.update { it.copy(working = true, message = null) }
+            val result = withContext(Dispatchers.IO) { reportFileWriter.writeXlsx(currentRequest()) }
+            result.fold(
+                onSuccess = { file ->
+                    fileSharer.share(file, strings.string(R.string.share_subject_xlsx), FileSharer.MIME_XLSX)
+                    _state.update {
+                        it.copy(working = false, generatedFileName = file.name, message = strings.string(R.string.msg_xlsx_ready))
+                    }
+                },
+                onFailure = { error ->
+                    _state.update { it.copy(working = false, message = error.metraError.userMessage) }
+                },
+            )
+        }
+    }
+
     fun consumeMessage() {
         _state.update { it.copy(message = null) }
     }

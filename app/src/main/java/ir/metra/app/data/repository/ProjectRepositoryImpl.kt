@@ -58,6 +58,9 @@ class ProjectRepositoryImpl @Inject constructor(
         }
         val now = clock.nowEpochMilli()
         val entity = project.toEntity().copy(
+            // A project keeps one uuid for life; restore matches on it even if
+            // the user later renames the project.
+            uuid = project.uuid.ifBlank { java.util.UUID.randomUUID().toString() },
             updatedAtEpochMilli = now,
             createdAtEpochMilli = if (project.id == 0L) now else project.createdAtEpochMilli,
         )

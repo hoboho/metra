@@ -31,6 +31,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class ExpenseRepositoryImpl @Inject constructor(
+    private val receiptPhotoStore: ir.metra.app.core.storage.ReceiptPhotoStore,
     private val database: MetraDatabase,
     private val expenseDao: ExpenseDao,
     private val workRecordDao: WorkRecordDao,
@@ -73,6 +74,9 @@ class ExpenseRepositoryImpl @Inject constructor(
             if (existing != null) {
                 expenseDao.delete(existing)
                 refreshTotal(existing.workRecordId)
+                // The photo is ours now; remove it with the expense so no
+                // orphaned file is left in filesDir/receipts.
+                receiptPhotoStore.delete(existing.receiptPhotoUri)
             }
         }
         success(Unit)

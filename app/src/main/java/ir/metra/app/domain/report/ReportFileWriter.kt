@@ -1,5 +1,7 @@
 package ir.metra.app.domain.report
 
+import org.dhatim.fastexcel.Workbook
+
 import ir.metra.app.core.common.Clock
 import ir.metra.app.core.common.MetraError
 import ir.metra.app.core.common.MetraResult
@@ -79,6 +81,49 @@ class ReportFileWriter @Inject constructor(
         success(file)
     }.fold({ it }, { failure(MetraError.Unknown(it.message ?: "csv")) })
 
+
+    /**
+     * Writes the same report data as a real .xlsx workbook.
+     *
+     * Unlike CSV this is a native spreadsheet: numbers stay numbers (so Excel
+     * can sum/sort them), the sheet is right-to-left, and the header row is
+     * bold. Uses FastExcel, which streams rows so a large report never has to
+     * fit in memory.
+     */
+    suspend fun writeXlsx(request: ReportRequest): MetraResult<File> = runCatching {
+        val data = reportBuilder.build(request).getOrThrow()
+        val file = targetFile(prefixFor(request.type), "xlsx")
+        file.outputStream().use { os ->
+            val wb = Workbook(os, "METRA", "1.0")
+            val ws = wb.newWorksheet(EXCEL_SHEET_NAME)
+            ws.rightToLeft()
+
+            EXCEL_HEADER.forEachIndexed { col, title -> ws.value(0, col, title) }
+            ws.range(0, 0, 0, EXCEL_HEADER.size - 1).style().bold().set()
+
+            data.records.forEachIndexed { index, record ->
+                val row = index + 1
+                ws.value(row, 0, dateFormatter.format(record.workDateEpochDay, persianDigits = false))
+                ws.value(row, 1, record.projectName)
+                ws.value(row, 2, record.workArea)
+                ws.value(row, 3, record.employer)
+                ws.value(row, 4, record.supervisor)
+                ws.value(row, 5, record.workerCount)
+                ws.value(row, 6, record.dailyMeters)
+                ws.value(row, 7, record.additionalMeters)
+                ws.value(row, 8, record.ratePerMeterSnapshot)
+                ws.value(row, 9, record.additionalMeterPayment)
+                ws.value(row, 10, record.expenseTotal)
+                ws.value(row, 11, record.notes)
+            }
+
+            EXCEL_HEADER.indices.forEach { ws.width(it, EXCEL_COLUMN_WIDTH) }
+            ws.finish()
+            wb.finish()
+        }
+        success(file)
+    }.fold({ it }, { failure(MetraError.Unknown(it.message ?: "xlsx")) })
+
     private fun prefixFor(type: ReportType): String = when (type) {
         ReportType.DAILY -> "metra-daily"
         ReportType.MONTHLY -> "metra-monthly"
@@ -102,6 +147,16 @@ class ReportFileWriter @Inject constructor(
 
         /** UTF-8 byte-order mark: without it Excel misreads Persian text. */
         const val BYTE_ORDER_MARK = "\uFEFF"
+
+        const val EXCEL_SHEET_NAME = "گزارش"
+        const val EXCEL_COLUMN_WIDTH = 16.0
+
+        /** Persian column headers for the .xlsx sheet (one per data column). */
+        val EXCEL_HEADER = listOf(
+            "تاریخ", "پروژه", "محدوده", "کارفرما", "ناظر", "تعداد کارگر",
+            "کارکرد", "متراژ اضافه", "نرخ", "مبلغ متراژ اضافه",
+            "هزینه قابل مطالبه", "توضیحات",
+        )
 
         /** Persian column headers, as required for Excel-friendly output. */
         val CSV_HEADER = listOf(

@@ -25,6 +25,7 @@ data class ExpenseEditorUiState(
     val amount: String = "",
     val category: ExpenseCategory = ExpenseCategory.TRANSPORTATION,
     val description: String = "",
+    val receiptPhotoPath: String? = null,
     val saving: Boolean = false,
     val saved: Boolean = false,
     val errorMessage: String? = null,
@@ -40,6 +41,7 @@ data class ExpenseEditorUiState(
  */
 @HiltViewModel
 class ExpenseEditorViewModel @Inject constructor(
+    private val receiptPhotoStore: ir.metra.app.core.storage.ReceiptPhotoStore,
     private val expenseRepository: ExpenseRepository,
     private val workRecordRepository: WorkRecordRepository,
     private val strings: StringProvider,
@@ -61,6 +63,7 @@ class ExpenseEditorViewModel @Inject constructor(
                             amount = expense.amount.toString(),
                             category = expense.category,
                             description = expense.description,
+                            receiptPhotoPath = expense.receiptPhotoUri,
                             loading = false,
                         )
                     }
@@ -83,6 +86,12 @@ class ExpenseEditorViewModel @Inject constructor(
         _state.update { it.copy(description = value) }
     }
 
+    /** Copies the picked image into app storage; see [ReceiptPhotoStore]. */
+    fun attachPhoto(uri: android.net.Uri) {
+        val path = receiptPhotoStore.copyFromUri(uri) ?: return
+        _state.update { it.copy(receiptPhotoPath = path) }
+    }
+
     fun save() {
         viewModelScope.launch {
             val current = _state.value
@@ -98,6 +107,7 @@ class ExpenseEditorViewModel @Inject constructor(
                 amount = amount,
                 category = current.category,
                 description = current.description,
+                receiptPhotoUri = current.receiptPhotoPath,
                 createdAtEpochMilli = clock.nowEpochMilli(),
             )
             val result = if (current.expenseId == 0L) {

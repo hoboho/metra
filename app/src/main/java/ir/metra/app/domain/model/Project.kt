@@ -8,6 +8,7 @@ package ir.metra.app.domain.model
  */
 data class Project(
     val id: Long = 0L,
+    val uuid: String = "",
     val name: String,
     val employer: String = "",
     val workArea: String = "",

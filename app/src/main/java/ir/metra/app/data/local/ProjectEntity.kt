@@ -22,6 +22,8 @@ import androidx.room.PrimaryKey
 )
 data class ProjectEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    /** Stable across renames; backups match on this, not [name]. */
+    @ColumnInfo(name = "uuid") val uuid: String = "",
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "employer") val employer: String = "",
     @ColumnInfo(name = "work_area") val workArea: String = "",

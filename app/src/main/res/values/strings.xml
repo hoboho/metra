@@ -471,4 +471,9 @@
     <string name="ledger_deleted">رسید حذف شد</string>
     <string name="msg_report_saved">فایل گزارش ذخیره شد</string>
     <string name="report_save_pdf">ذخیره PDF در فایل</string>
+    <string name="expense_attach_photo">پیوست تصویر رسید</string>
+    <string name="expense_photo_attached">تصویر رسید ضمیمه شد</string>
+    <string name="report_generate_excel">خروجی Excel</string>
+    <string name="msg_xlsx_ready">فایل Excel آماده است</string>
+    <string name="share_subject_xlsx">خروجی Excel مترا</string>
 </resources>

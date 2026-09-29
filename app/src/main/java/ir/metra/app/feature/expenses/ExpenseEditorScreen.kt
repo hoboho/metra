@@ -15,6 +15,12 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Image
+import ir.metra.app.ui.components.ChoiceChips
+import ir.metra.app.ui.components.MetraButton
+import ir.metra.app.ui.components.MetraButtonLevel
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
@@ -108,29 +114,18 @@ fun ExpenseEditorScreen(
                     errorMessage = state.errorMessage,
                 )
                 Spacer(Modifier.height(8.dp))
-                ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
-                    OutlinedTextField(
-                        value = expenseCategoryLabel(state.category),
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text(stringResource(R.string.expense_category)) },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth(),
-                    )
-                    ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                        ExpenseCategory.entries.forEach { category ->
-                            DropdownMenuItem(
-                                text = { Text(expenseCategoryLabel(category)) },
-                                onClick = {
-                                    viewModel.onCategoryChange(category)
-                                    expanded = false
-                                },
-                            )
-                        }
-                    }
-                }
+                Text(
+                    text = stringResource(R.string.expense_category),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.height(6.dp))
+                ChoiceChips(
+                    options = ExpenseCategory.entries.toList(),
+                    selected = state.category,
+                    onSelected = { viewModel.onCategoryChange(it) },
+                    labelOf = { expenseCategoryLabel(it) },
+                )
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
                     value = state.description,
@@ -140,37 +135,50 @@ fun ExpenseEditorScreen(
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(Modifier.height(8.dp))
-                OutlinedButton(
-                    onClick = {
-                        pickPhoto.launch(
-                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
+                if (state.receiptPhotoPath != null) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        MetraButton(
+                            text = stringResource(R.string.expense_change_photo),
+                            onClick = {
+                                pickPhoto.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                            },
+                            level = MetraButtonLevel.Outline,
+                            icon = Icons.Filled.Image,
+                            fullWidth = false,
+                            modifier = Modifier.weight(1f),
                         )
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(
-                        if (state.receiptPhotoPath != null) {
-                            stringResource(R.string.expense_photo_attached)
-                        } else {
-                            stringResource(R.string.expense_attach_photo)
+                        MetraButton(
+                            text = stringResource(R.string.expense_remove_photo),
+                            onClick = { viewModel.removePhoto() },
+                            level = MetraButtonLevel.Danger,
+                            icon = Icons.Filled.Delete,
+                            fullWidth = false,
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                } else {
+                    MetraButton(
+                        text = stringResource(R.string.expense_attach_photo),
+                        onClick = {
+                            pickPhoto.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                         },
+                        level = MetraButtonLevel.Secondary,
+                        icon = Icons.Filled.Image,
                     )
                 }
             }
-            Button(
+            MetraButton(
+                text = stringResource(R.string.action_save),
                 onClick = { viewModel.save() },
-                enabled = !state.saving,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                if (state.saving) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.height(18.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                    )
-                } else {
-                    Text(stringResource(R.string.action_save))
-                }
+                loading = state.saving,
+            )
+            if (expenseId != 0L) {
+                MetraButton(
+                    text = stringResource(R.string.expense_delete),
+                    onClick = { viewModel.delete() },
+                    level = MetraButtonLevel.Danger,
+                    icon = Icons.Filled.Delete,
+                )
             }
         }
     }

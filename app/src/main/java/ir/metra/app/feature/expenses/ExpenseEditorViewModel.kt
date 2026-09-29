@@ -92,6 +92,23 @@ class ExpenseEditorViewModel @Inject constructor(
         _state.update { it.copy(receiptPhotoPath = path) }
     }
 
+    /** Removes the attached receipt photo and deletes its copied file. */
+    fun removePhoto() {
+        receiptPhotoStore.delete(_state.value.receiptPhotoPath)
+        _state.update { it.copy(receiptPhotoPath = null) }
+    }
+
+    /** Deletes the expense being edited, then closes the screen. */
+    fun delete() {
+        viewModelScope.launch {
+            val id = _state.value.expenseId
+            if (id != 0L) {
+                expenseRepository.delete(id)
+                _state.update { it.copy(saved = true) }
+            }
+        }
+    }
+
     fun save() {
         viewModelScope.launch {
             val current = _state.value

@@ -482,4 +482,7 @@
     <string name="settings_update_note">نسخهٔ فعلی: %1$s. با زدن دکمه، صفحهٔ Releases در مرورگر باز می‌شود تا آخرین نسخه را دانلود و نصب کنید.</string>
     <string name="report_save_excel">ذخیرهٔ فایل Excel</string>
     <string name="report_save_csv">ذخیرهٔ فایل CSV</string>
+    <string name="expense_change_photo">تغییر تصویر</string>
+    <string name="expense_remove_photo">حذف تصویر</string>
+    <string name="expense_delete">حذف هزینه</string>
 </resources>

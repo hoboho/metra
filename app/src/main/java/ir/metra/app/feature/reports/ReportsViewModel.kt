@@ -149,6 +149,12 @@ class ReportsViewModel @Inject constructor(
     fun suggestedPdfName(): String =
         "metra-${JalaliCalendar.today().toEpochDay()}.pdf"
 
+    fun suggestedXlsxName(): String =
+        "metra-${JalaliCalendar.today().toEpochDay()}.xlsx"
+
+    fun suggestedCsvName(): String =
+        "metra-${JalaliCalendar.today().toEpochDay()}.csv"
+
     /**
      * Builds the PDF and copies it into [target], a content Uri returned by the
      * system file picker.
@@ -168,6 +174,70 @@ class ReportsViewModel @Inject constructor(
                     includeNotes = _state.value.includeNotes,
                 )
                 generated.fold(
+                    onSuccess = { file ->
+                        runCatching {
+                            appContext.contentResolver.openOutputStream(target)?.use { out ->
+                                file.inputStream().use { input -> input.copyTo(out) }
+                            } ?: error("no output stream")
+                        }.map { file.name }
+                    },
+                    onFailure = { error -> Result.failure<String>(error) },
+                )
+            }
+            _state.update {
+                it.copy(
+                    working = false,
+                    message = outcome.fold(
+                        onSuccess = { strings.string(R.string.msg_report_saved) },
+                        onFailure = { error -> error.metraError.userMessage },
+                    ),
+                    generatedFileName = outcome.getOrNull() ?: it.generatedFileName,
+                )
+            }
+        }
+    }
+
+    /**
+     * Builds the .xlsx and copies it into [target], a content Uri from the
+     * system file picker — so the user chooses where the Excel file is saved
+     * (no storage permission, no share sheet).
+     */
+    fun saveXlsxTo(target: Uri) {
+        viewModelScope.launch {
+            _state.update { it.copy(working = true, message = null) }
+            val request = currentRequest()
+            val outcome = withContext(Dispatchers.IO) {
+                reportFileWriter.writeXlsx(request).fold(
+                    onSuccess = { file ->
+                        runCatching {
+                            appContext.contentResolver.openOutputStream(target)?.use { out ->
+                                file.inputStream().use { input -> input.copyTo(out) }
+                            } ?: error("no output stream")
+                        }.map { file.name }
+                    },
+                    onFailure = { error -> Result.failure<String>(error) },
+                )
+            }
+            _state.update {
+                it.copy(
+                    working = false,
+                    message = outcome.fold(
+                        onSuccess = { strings.string(R.string.msg_report_saved) },
+                        onFailure = { error -> error.metraError.userMessage },
+                    ),
+                    generatedFileName = outcome.getOrNull() ?: it.generatedFileName,
+                )
+            }
+        }
+    }
+
+    /** Builds the CSV and copies it into [target] (system file picker). */
+    fun saveCsvTo(target: Uri) {
+        viewModelScope.launch {
+            _state.update { it.copy(working = true, message = null) }
+            val request = currentRequest()
+            val outcome = withContext(Dispatchers.IO) {
+                reportFileWriter.writeCsv(request).fold(
                     onSuccess = { file ->
                         runCatching {
                             appContext.contentResolver.openOutputStream(target)?.use { out ->

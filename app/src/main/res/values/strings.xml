@@ -480,4 +480,6 @@
     <string name="settings_section_update">به‌روزرسانی</string>
     <string name="settings_check_update">بررسی نسخهٔ جدید</string>
     <string name="settings_update_note">نسخهٔ فعلی: %1$s. با زدن دکمه، صفحهٔ Releases در مرورگر باز می‌شود تا آخرین نسخه را دانلود و نصب کنید.</string>
+    <string name="report_save_excel">ذخیرهٔ فایل Excel</string>
+    <string name="report_save_csv">ذخیرهٔ فایل CSV</string>
 </resources>

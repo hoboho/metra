@@ -69,6 +69,18 @@ fun ReportsScreen(
         // A null Uri means the user backed out of the picker: nothing to do.
         if (uri != null) viewModel.savePdfTo(uri)
     }
+    val saveXlsxLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument(
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        ),
+    ) { uri ->
+        if (uri != null) viewModel.saveXlsxTo(uri)
+    }
+    val saveCsvLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("text/csv"),
+    ) { uri ->
+        if (uri != null) viewModel.saveCsvTo(uri)
+    }
     val snackbarHostState = remember { SnackbarHostState() }
     var showStartPicker by remember { mutableStateOf(false) }
     var showEndPicker by remember { mutableStateOf(false) }
@@ -202,23 +214,6 @@ fun ReportsScreen(
                 )
             }
 
-            Button(
-                onClick = { viewModel.generateAndSharePdf() },
-                enabled = !state.working,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                if (state.working) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.height(18.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                    )
-                } else {
-                    Icon(Icons.Filled.Description, contentDescription = null)
-                    Spacer(Modifier.padding(4.dp))
-                    Text(stringResource(R.string.report_generate_pdf))
-                }
-            }
             // Save-to-file goes through the system document picker: no storage
             // permission, and the user picks a folder they can find again.
             OutlinedButton(
@@ -231,22 +226,22 @@ fun ReportsScreen(
                 Text(stringResource(R.string.report_save_pdf))
             }
             OutlinedButton(
-                onClick = { viewModel.generateAndShareCsv() },
+                onClick = { saveCsvLauncher.launch(viewModel.suggestedCsvName()) },
                 enabled = !state.working,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Icon(Icons.Filled.TableChart, contentDescription = null)
+                Icon(Icons.Filled.SaveAlt, contentDescription = null)
                 Spacer(Modifier.padding(4.dp))
-                Text(stringResource(R.string.report_generate_csv))
+                Text(stringResource(R.string.report_save_csv))
             }
             OutlinedButton(
-                onClick = { viewModel.generateAndShareXlsx() },
+                onClick = { saveXlsxLauncher.launch(viewModel.suggestedXlsxName()) },
                 enabled = !state.working,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Icon(Icons.Filled.TableChart, contentDescription = null)
+                Icon(Icons.Filled.SaveAlt, contentDescription = null)
                 Spacer(Modifier.padding(4.dp))
-                Text(stringResource(R.string.report_generate_excel))
+                Text(stringResource(R.string.report_save_excel))
             }
         }
     }

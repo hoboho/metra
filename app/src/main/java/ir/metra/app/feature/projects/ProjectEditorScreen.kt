@@ -12,6 +12,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Notes
+import ir.metra.app.ui.components.MetraButton
+import ir.metra.app.ui.components.MetraTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -83,38 +90,34 @@ fun ProjectEditorScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             SectionCard(title = stringResource(R.string.projects_title)) {
-                OutlinedTextField(
+                MetraTextField(
                     value = state.name,
                     onValueChange = { value -> viewModel.onFieldChange { it.copy(name = value) } },
-                    label = { Text(stringResource(R.string.project_name)) },
+                    label = stringResource(R.string.project_name),
+                    leadingIcon = Icons.Filled.Folder,
                     isError = state.errorMessage != null,
-                    supportingText = state.errorMessage?.let { { Text(it) } },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
+                    errorMessage = state.errorMessage,
                 )
                 Spacer(Modifier.height(8.dp))
-                OutlinedTextField(
+                MetraTextField(
                     value = state.employer,
                     onValueChange = { value -> viewModel.onFieldChange { it.copy(employer = value) } },
-                    label = { Text(stringResource(R.string.project_employer)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
+                    label = stringResource(R.string.project_employer),
+                    leadingIcon = Icons.Filled.Business,
                 )
                 Spacer(Modifier.height(8.dp))
-                OutlinedTextField(
+                MetraTextField(
                     value = state.workArea,
                     onValueChange = { value -> viewModel.onFieldChange { it.copy(workArea = value) } },
-                    label = { Text(stringResource(R.string.project_work_area)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
+                    label = stringResource(R.string.project_work_area),
+                    leadingIcon = Icons.Filled.LocationOn,
                 )
                 Spacer(Modifier.height(8.dp))
-                OutlinedTextField(
+                MetraTextField(
                     value = state.defaultSupervisor,
                     onValueChange = { value -> viewModel.onFieldChange { it.copy(defaultSupervisor = value) } },
-                    label = { Text(stringResource(R.string.project_default_supervisor)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
+                    label = stringResource(R.string.project_default_supervisor),
+                    leadingIcon = Icons.Filled.Person,
                 )
                 Spacer(Modifier.height(8.dp))
                 MetraNumberField(
@@ -123,12 +126,13 @@ fun ProjectEditorScreen(
                     label = stringResource(R.string.project_default_worker_count),
                 )
                 Spacer(Modifier.height(8.dp))
-                OutlinedTextField(
+                MetraTextField(
                     value = state.notes,
                     onValueChange = { value -> viewModel.onFieldChange { it.copy(notes = value) } },
-                    label = { Text(stringResource(R.string.project_notes)) },
+                    label = stringResource(R.string.project_notes),
+                    leadingIcon = Icons.Filled.Notes,
+                    singleLine = false,
                     minLines = 2,
-                    modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(Modifier.height(8.dp))
                 Row(
@@ -144,21 +148,11 @@ fun ProjectEditorScreen(
                 }
             }
 
-            Button(
+            MetraButton(
+                text = stringResource(R.string.action_save),
                 onClick = { viewModel.save() },
-                enabled = !state.saving,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                if (state.saving) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.height(18.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                    )
-                } else {
-                    Text(stringResource(R.string.action_save))
-                }
-            }
+                loading = state.saving,
+            )
         }
     }
 }

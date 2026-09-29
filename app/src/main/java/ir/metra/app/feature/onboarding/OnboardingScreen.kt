@@ -33,6 +33,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ir.metra.app.R
 import ir.metra.app.core.format.DateFormatter
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Schedule
+import ir.metra.app.ui.components.MetraButton
+import ir.metra.app.ui.components.MetraButtonLevel
+import ir.metra.app.ui.components.MetraTextField
 import ir.metra.app.ui.components.MetraNumberField
 import ir.metra.app.ui.components.MinuteOfDayPickerDialog
 
@@ -106,38 +113,36 @@ fun OnboardingScreen(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             if (state.step > 0) {
-                OutlinedButton(onClick = { viewModel.back() }, modifier = Modifier.weight(1f)) {
-                    Text(stringResource(R.string.action_back))
-                }
+                MetraButton(
+                    text = stringResource(R.string.action_back),
+                    onClick = { viewModel.back() },
+                    level = MetraButtonLevel.Outline,
+                    fullWidth = false,
+                    modifier = Modifier.weight(1f),
+                )
             }
-            Button(
-                onClick = { if (state.isLastStep) viewModel.finish() else viewModel.next() },
-                enabled = state.canContinue && !state.saving,
-                modifier = Modifier.weight(1f),
-            ) {
-                if (state.saving) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.height(18.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                    )
+            MetraButton(
+                text = if (state.isLastStep) {
+                    stringResource(R.string.onboarding_finish)
                 } else {
-                    Text(
-                        if (state.isLastStep) {
-                            stringResource(R.string.onboarding_finish)
-                        } else {
-                            stringResource(R.string.onboarding_next)
-                        },
-                    )
-                }
-            }
+                    stringResource(R.string.onboarding_next)
+                },
+                onClick = { if (state.isLastStep) viewModel.finish() else viewModel.next() },
+                loading = state.saving,
+                enabled = state.canContinue && !state.saving,
+                fullWidth = false,
+                modifier = Modifier.weight(1f),
+            )
         }
         if (!state.isLastStep) {
             Spacer(Modifier.height(8.dp))
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                OutlinedButton(onClick = { viewModel.finish() }) {
-                    Text(stringResource(R.string.onboarding_skip))
-                }
+                MetraButton(
+                    text = stringResource(R.string.onboarding_skip),
+                    onClick = { viewModel.finish() },
+                    level = MetraButtonLevel.Text,
+                    fullWidth = false,
+                )
             }
         }
     }
@@ -173,20 +178,20 @@ private fun ProfileStep(
         Spacer(Modifier.height(8.dp))
         Text(stringResource(R.string.onboarding_profile_body), style = MaterialTheme.typography.bodyMedium)
         Spacer(Modifier.height(16.dp))
-        OutlinedTextField(
+        MetraTextField(
             value = fullName,
             onValueChange = onFullNameChange,
-            label = { Text(stringResource(R.string.settings_full_name)) },
+            label = stringResource(R.string.settings_full_name),
             singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = Icons.Filled.Person,
         )
         Spacer(Modifier.height(12.dp))
-        OutlinedTextField(
+        MetraTextField(
             value = companyName,
             onValueChange = onCompanyNameChange,
-            label = { Text(stringResource(R.string.settings_company_name)) },
+            label = stringResource(R.string.settings_company_name),
             singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = Icons.Filled.Business,
         )
     }
 }
@@ -248,9 +253,12 @@ private fun ReminderStep(
         }
         if (enabled) {
             Spacer(Modifier.height(8.dp))
-            OutlinedButton(onClick = onPickTime, modifier = Modifier.fillMaxWidth()) {
-                Text("${stringResource(R.string.settings_reminder_time)}: $formattedTime")
-            }
+            MetraButton(
+                text = "${stringResource(R.string.settings_reminder_time)}: $formattedTime",
+                onClick = onPickTime,
+                level = MetraButtonLevel.Outline,
+                icon = Icons.Filled.Schedule,
+            )
         }
     }
 }

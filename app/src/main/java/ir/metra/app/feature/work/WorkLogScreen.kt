@@ -64,6 +64,7 @@ import ir.metra.app.R
 import ir.metra.app.core.date.JalaliDate
 import ir.metra.app.core.format.PersianDigits
 import ir.metra.app.domain.repository.WorkRecordSort
+import ir.metra.app.ui.components.MetraTextField
 import ir.metra.app.ui.components.TagChip
 
 /**
@@ -116,11 +117,12 @@ fun WorkLogScreen(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            OutlinedTextField(
+            MetraTextField(
                 value = state.query,
                 onValueChange = { viewModel.onQueryChange(it) },
-                placeholder = { Text(stringResource(R.string.worklog_search_hint)) },
-                leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+                label = "",
+                placeholder = stringResource(R.string.worklog_search_hint),
+                leadingIcon = Icons.Filled.Search,
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()

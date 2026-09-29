@@ -48,6 +48,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ir.metra.app.R
 import ir.metra.app.domain.model.ReportType
 import ir.metra.app.ui.components.JalaliDatePickerDialog
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.GridOn
+import androidx.compose.material.icons.filled.PictureAsPdf
+import ir.metra.app.ui.components.MetraButton
+import ir.metra.app.ui.components.MetraButtonLevel
 import ir.metra.app.ui.components.SectionCard
 import ir.metra.app.ui.components.StatRow
 
@@ -111,12 +116,22 @@ fun ReportsScreen(
 
             SectionCard(title = stringResource(R.string.report_period)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(onClick = { showStartPicker = true }, modifier = Modifier.weight(1f)) {
-                        Text(state.startLabel)
-                    }
-                    OutlinedButton(onClick = { showEndPicker = true }, modifier = Modifier.weight(1f)) {
-                        Text(state.endLabel)
-                    }
+                    MetraButton(
+                        text = state.startLabel,
+                        onClick = { showStartPicker = true },
+                        level = MetraButtonLevel.Outline,
+                        icon = Icons.Filled.CalendarToday,
+                        fullWidth = false,
+                        modifier = Modifier.weight(1f),
+                    )
+                    MetraButton(
+                        text = state.endLabel,
+                        onClick = { showEndPicker = true },
+                        level = MetraButtonLevel.Outline,
+                        icon = Icons.Filled.CalendarToday,
+                        fullWidth = false,
+                        modifier = Modifier.weight(1f),
+                    )
                 }
                 if (state.reportType == ReportType.PROJECT) {
                     Spacer(Modifier.height(8.dp))
@@ -216,33 +231,27 @@ fun ReportsScreen(
 
             // Save-to-file goes through the system document picker: no storage
             // permission, and the user picks a folder they can find again.
-            OutlinedButton(
+            MetraButton(
+                text = stringResource(R.string.report_save_pdf),
                 onClick = { savePdfLauncher.launch(viewModel.suggestedPdfName()) },
+                level = MetraButtonLevel.Outline,
+                icon = Icons.Filled.PictureAsPdf,
                 enabled = !state.working,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Icon(Icons.Filled.SaveAlt, contentDescription = null)
-                Spacer(Modifier.padding(4.dp))
-                Text(stringResource(R.string.report_save_pdf))
-            }
-            OutlinedButton(
+            )
+            MetraButton(
+                text = stringResource(R.string.report_save_csv),
                 onClick = { saveCsvLauncher.launch(viewModel.suggestedCsvName()) },
+                level = MetraButtonLevel.Outline,
+                icon = Icons.Filled.TableChart,
                 enabled = !state.working,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Icon(Icons.Filled.SaveAlt, contentDescription = null)
-                Spacer(Modifier.padding(4.dp))
-                Text(stringResource(R.string.report_save_csv))
-            }
-            OutlinedButton(
+            )
+            MetraButton(
+                text = stringResource(R.string.report_save_excel),
                 onClick = { saveXlsxLauncher.launch(viewModel.suggestedXlsxName()) },
+                level = MetraButtonLevel.Outline,
+                icon = Icons.Filled.GridOn,
                 enabled = !state.working,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Icon(Icons.Filled.SaveAlt, contentDescription = null)
-                Spacer(Modifier.padding(4.dp))
-                Text(stringResource(R.string.report_save_excel))
-            }
+            )
         }
     }
 

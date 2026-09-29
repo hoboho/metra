@@ -39,6 +39,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ir.metra.app.R
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Backup
+import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.SettingsBackupRestore
+import androidx.compose.material.icons.filled.TableChart
+import ir.metra.app.ui.components.MetraButton
+import ir.metra.app.ui.components.MetraButtonLevel
+import ir.metra.app.ui.components.MetraTextField
 import ir.metra.app.domain.backup.RestoreStrategy
 
 /**
@@ -100,7 +109,8 @@ fun BackupScreen(
                         onCheckedChange = { viewModel.setEncryptBackup(it) },
                     )
                     Spacer(Modifier.height(8.dp))
-                    Button(
+                    MetraButton(
+                        text = stringResource(R.string.settings_backup),
                         onClick = {
                             if (state.encryptBackup) {
                                 showPassphraseDialog = true
@@ -108,19 +118,10 @@ fun BackupScreen(
                                 exportLauncher.launch(viewModel.suggestedFileName())
                             }
                         },
+                        icon = Icons.Filled.Backup,
+                        loading = state.working,
                         enabled = !state.working,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        if (state.working) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.height(18.dp),
-                                strokeWidth = 2.dp,
-                                color = MaterialTheme.colorScheme.onPrimary,
-                            )
-                        } else {
-                            Text(stringResource(R.string.settings_backup))
-                        }
-                    }
+                    )
                 }
             }
 
@@ -137,27 +138,33 @@ fun BackupScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Spacer(Modifier.height(8.dp))
-                    OutlinedButton(
+                    MetraButton(
+                        text = stringResource(R.string.settings_restore),
                         onClick = { importLauncher.launch(arrayOf("*/*")) },
+                        level = MetraButtonLevel.Outline,
+                        icon = Icons.Filled.SettingsBackupRestore,
                         enabled = !state.working,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) { Text(stringResource(R.string.settings_restore)) }
+                    )
                 }
             }
 
             item {
                 Column {
-                    OutlinedButton(
+                    MetraButton(
+                        text = stringResource(R.string.settings_export_csv),
                         onClick = { viewModel.exportCsv() },
+                        level = MetraButtonLevel.Outline,
+                        icon = Icons.Filled.TableChart,
                         enabled = !state.working,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) { Text(stringResource(R.string.settings_export_csv)) }
+                    )
                     Spacer(Modifier.height(8.dp))
-                    OutlinedButton(
+                    MetraButton(
+                        text = stringResource(R.string.settings_export_json),
                         onClick = { viewModel.exportJson() },
+                        level = MetraButtonLevel.Outline,
+                        icon = Icons.Filled.Code,
                         enabled = !state.working,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) { Text(stringResource(R.string.settings_export_json)) }
+                    )
                 }
             }
         }
@@ -224,12 +231,12 @@ private fun PassphraseDialog(
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
         title = { Text(title) },
         text = {
-            OutlinedTextField(
+            MetraTextField(
                 value = passphrase,
                 onValueChange = { passphrase = it },
-                label = { Text(hint) },
+                label = hint,
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
+                leadingIcon = Icons.Filled.Lock,
             )
         },
     )
@@ -306,12 +313,12 @@ private fun RestorePreviewDialog(
                 }
                 if (showPassphrase) {
                     Spacer(Modifier.height(8.dp))
-                    OutlinedTextField(
+                    MetraTextField(
                         value = passphrase,
                         onValueChange = { passphrase = it },
-                        label = { Text(stringResource(R.string.backup_passphrase_restore_hint)) },
+                        label = stringResource(R.string.backup_passphrase_restore_hint),
                         singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
+                        leadingIcon = Icons.Filled.Lock,
                     )
                 }
                 Spacer(Modifier.height(8.dp))

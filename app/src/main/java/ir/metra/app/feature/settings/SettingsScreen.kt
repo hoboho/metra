@@ -46,6 +46,21 @@ import ir.metra.app.R
 import ir.metra.app.data.preferences.ThemeMode
 import ir.metra.app.ui.components.MinuteOfDayPickerDialog
 import ir.metra.app.ui.components.ChoiceChips
+import androidx.compose.material.icons.filled.Badge
+import androidx.compose.material.icons.filled.Backup
+import androidx.compose.material.icons.filled.Business
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Notes
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Storage
+import androidx.compose.ui.text.input.KeyboardType
+import ir.metra.app.ui.components.MetraButton
+import ir.metra.app.ui.components.MetraButtonLevel
+import ir.metra.app.ui.components.MetraTextField
 import ir.metra.app.ui.components.SectionCard
 import ir.metra.app.ui.components.StatRow
 import ir.metra.app.ui.components.TagChip
@@ -88,35 +103,36 @@ fun SettingsScreen(
             // ------------------------------------------------------- profile
             item {
                 SectionCard(title = stringResource(R.string.settings_section_profile)) {
-                    OutlinedTextField(
+                    MetraTextField(
                         value = state.profile.fullName,
                         onValueChange = { value -> viewModel.onProfileChange { it.copy(fullName = value) } },
-                        label = { Text(stringResource(R.string.settings_full_name)) },
+                        label = stringResource(R.string.settings_full_name),
                         singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
+                        leadingIcon = Icons.Filled.Person,
                     )
                     Spacer(Modifier.height(8.dp))
-                    OutlinedTextField(
+                    MetraTextField(
                         value = state.profile.companyName,
                         onValueChange = { value -> viewModel.onProfileChange { it.copy(companyName = value) } },
-                        label = { Text(stringResource(R.string.settings_company_name)) },
+                        label = stringResource(R.string.settings_company_name),
                         singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
+                        leadingIcon = Icons.Filled.Business,
                     )
                     Spacer(Modifier.height(8.dp))
-                    OutlinedTextField(
+                    MetraTextField(
                         value = state.profile.employeeCode,
                         onValueChange = { value -> viewModel.onProfileChange { it.copy(employeeCode = value) } },
-                        label = { Text(stringResource(R.string.settings_employee_code)) },
+                        label = stringResource(R.string.settings_employee_code),
                         singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
+                        leadingIcon = Icons.Filled.Badge,
                     )
                     Spacer(Modifier.height(8.dp))
-                    OutlinedTextField(
+                    MetraTextField(
                         value = state.profile.reportFooterNote,
                         onValueChange = { value -> viewModel.onProfileChange { it.copy(reportFooterNote = value) } },
-                        label = { Text(stringResource(R.string.settings_report_footer)) },
-                        modifier = Modifier.fillMaxWidth(),
+                        label = stringResource(R.string.settings_report_footer),
+                        leadingIcon = Icons.Filled.Notes,
+                        minLines = 2,
                     )
                 }
             }
@@ -148,7 +164,8 @@ fun SettingsScreen(
             item {
                 SectionCard(title = stringResource(R.string.settings_section_update)) {
                     val context = LocalContext.current
-                    OutlinedButton(
+                    MetraButton(
+                        text = stringResource(R.string.settings_check_update),
                         onClick = {
                             context.startActivity(
                                 Intent(
@@ -157,10 +174,9 @@ fun SettingsScreen(
                                 ),
                             )
                         },
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text(stringResource(R.string.settings_check_update))
-                    }
+                        level = MetraButtonLevel.Outline,
+                        icon = Icons.Filled.Refresh,
+                    )
                     Text(
                         text = stringResource(R.string.settings_update_note, BuildConfig.VERSION_NAME),
                         style = MaterialTheme.typography.bodySmall,
@@ -172,41 +188,45 @@ fun SettingsScreen(
             // ------------------------------------------------- work defaults
             item {
                 SectionCard(title = stringResource(R.string.settings_section_defaults)) {
-                    OutlinedTextField(
+                    MetraTextField(
                         value = state.settings.defaultWorkArea,
                         onValueChange = { value ->
                             viewModel.onSettingsChange { it.copy(defaultWorkArea = value) }
                         },
-                        label = { Text(stringResource(R.string.settings_default_work_area)) },
+                        label = stringResource(R.string.settings_default_work_area),
                         singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
+                        leadingIcon = Icons.Filled.LocationOn,
                     )
                     Spacer(Modifier.height(8.dp))
-                    OutlinedTextField(
+                    MetraTextField(
                         value = state.settings.defaultSupervisor,
                         onValueChange = { value ->
                             viewModel.onSettingsChange { it.copy(defaultSupervisor = value) }
                         },
-                        label = { Text(stringResource(R.string.settings_default_supervisor)) },
+                        label = stringResource(R.string.settings_default_supervisor),
                         singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
+                        leadingIcon = Icons.Filled.Person,
                     )
                     Spacer(Modifier.height(8.dp))
-                    OutlinedTextField(
+                    MetraTextField(
                         value = state.settings.defaultWorkerCount.toString(),
                         onValueChange = { value ->
                             viewModel.onSettingsChange {
                                 it.copy(defaultWorkerCount = value.toIntOrNull() ?: 0)
                             }
                         },
-                        label = { Text(stringResource(R.string.settings_default_worker_count)) },
+                        label = stringResource(R.string.settings_default_worker_count),
                         singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
+                        leadingIcon = Icons.Filled.Groups,
+                        keyboardType = KeyboardType.Number,
                     )
                     Spacer(Modifier.height(8.dp))
-                    OutlinedButton(onClick = onOpenProjects, modifier = Modifier.fillMaxWidth()) {
-                        Text(stringResource(R.string.settings_projects))
-                    }
+                    MetraButton(
+                        text = stringResource(R.string.settings_projects),
+                        onClick = onOpenProjects,
+                        level = MetraButtonLevel.Outline,
+                        icon = Icons.Filled.Folder,
+                    )
                     Spacer(Modifier.height(8.dp))
                     SwitchRow(
                         label = stringResource(R.string.settings_use_previous_workday),
@@ -233,13 +253,13 @@ fun SettingsScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Spacer(Modifier.height(8.dp))
-                    OutlinedButton(
+                    MetraButton(
+                        text = "${stringResource(R.string.settings_reminder_time)}: ${state.reminderTimeLabel}",
                         onClick = { showReminderPicker = true },
+                        level = MetraButtonLevel.Outline,
+                        icon = Icons.Filled.Schedule,
                         enabled = state.settings.reminderEnabled,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text("${stringResource(R.string.settings_reminder_time)}: ${state.reminderTimeLabel}")
-                    }
+                    )
                 }
             }
 
@@ -264,13 +284,19 @@ fun SettingsScreen(
             // ---------------------------------------------------------- data
             item {
                 SectionCard(title = stringResource(R.string.settings_section_data)) {
-                    OutlinedButton(onClick = onOpenBackup, modifier = Modifier.fillMaxWidth()) {
-                        Text(stringResource(R.string.settings_backup))
-                    }
+                    MetraButton(
+                        text = stringResource(R.string.settings_backup),
+                        onClick = onOpenBackup,
+                        level = MetraButtonLevel.Outline,
+                        icon = Icons.Filled.Backup,
+                    )
                     Spacer(Modifier.height(8.dp))
-                    OutlinedButton(onClick = onOpenDatabaseInfo, modifier = Modifier.fillMaxWidth()) {
-                        Text(stringResource(R.string.settings_database_info))
-                    }
+                    MetraButton(
+                        text = stringResource(R.string.settings_database_info),
+                        onClick = onOpenDatabaseInfo,
+                        level = MetraButtonLevel.Outline,
+                        icon = Icons.Filled.Storage,
+                    )
                 }
             }
 
@@ -315,21 +341,4 @@ private fun SwitchRow(label: String, checked: Boolean, onCheckedChange: (Boolean
     }
 }
 
-@Composable
-private fun ThemeRow(label: String, selected: Boolean, onClick: () -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        TextButton(onClick = onClick, modifier = Modifier.weight(1f)) {
-            Text(
-                text = label,
-                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-                color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-            )
-        }
-        if (selected) TagChip(stringResource(R.string.action_confirm))
-    }
-}
 

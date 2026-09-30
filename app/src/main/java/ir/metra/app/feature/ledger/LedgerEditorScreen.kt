@@ -33,6 +33,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ir.metra.app.R
 import ir.metra.app.domain.model.LedgerKind
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notes
+import ir.metra.app.domain.model.reasonsFor
+import ir.metra.app.ui.components.ChoiceChips
+import ir.metra.app.ui.components.MetraButton
+import ir.metra.app.ui.components.MetraNumberField
+import ir.metra.app.ui.components.MetraTextField
 import ir.metra.app.domain.model.LedgerReason
 
 /** Toman amounts offered as one-tap chips so a receipt takes two taps, not ten. */
@@ -98,16 +105,13 @@ fun LedgerEditorScreen(
 
             // ----------------------------------------------------- amount
             item {
-                FieldLabel(stringResource(R.string.ledger_amount))
-                Spacer(Modifier.height(6.dp))
-                OutlinedTextField(
+                MetraNumberField(
                     value = state.amount,
                     onValueChange = viewModel::onAmountChange,
-                    modifier = Modifier.fillMaxWidth(),
-                    suffix = { Text(stringResource(R.string.toman)) },
-                    singleLine = true,
+                    label = stringResource(R.string.ledger_amount),
+                    suffix = stringResource(R.string.toman),
                     isError = state.error != null,
-                    supportingText = state.error?.let { { Text(it) } },
+                    errorMessage = state.error,
                 )
                 Spacer(Modifier.height(8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
@@ -129,15 +133,12 @@ fun LedgerEditorScreen(
             item {
                 FieldLabel(stringResource(R.string.ledger_reason))
                 Spacer(Modifier.height(6.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                    LedgerReason.entries.forEach { reason ->
-                        FilterChip(
-                            selected = state.reason == reason,
-                            onClick = { viewModel.onReasonChange(reason) },
-                            label = { Text(reasonLabel(reason)) },
-                        )
-                    }
-                }
+                ChoiceChips(
+                    options = reasonsFor(state.kind),
+                    selected = state.reason,
+                    onSelected = { viewModel.onReasonChange(it) },
+                    labelOf = { reasonLabel(it) },
+                )
             }
 
             // ------------------------------------------------------- date
@@ -207,29 +208,20 @@ fun LedgerEditorScreen(
 
             // ------------------------------------------------------ notes
             item {
-                FieldLabel(stringResource(R.string.ledger_notes))
-                Spacer(Modifier.height(6.dp))
-                OutlinedTextField(
+                MetraTextField(
                     value = state.notes,
                     onValueChange = viewModel::onNotesChange,
-                    modifier = Modifier.fillMaxWidth(),
+                    label = stringResource(R.string.ledger_notes),
                     minLines = 2,
+                    leadingIcon = Icons.Filled.Notes,
                 )
             }
 
             item {
-                Button(
+                MetraButton(
+                    text = stringResource(R.string.ledger_save),
                     onClick = viewModel::save,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp),
-                    shape = RoundedCornerShape(14.dp),
-                ) {
-                    Text(
-                        text = stringResource(R.string.ledger_save),
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                    )
-                }
+                )
             }
         }
     }
@@ -250,4 +242,7 @@ private fun reasonLabel(reason: LedgerReason): String = when (reason) {
     LedgerReason.EXPENSE -> stringResource(R.string.ledger_reason_expense)
     LedgerReason.SALARY -> stringResource(R.string.ledger_reason_salary)
     LedgerReason.OTHER -> stringResource(R.string.ledger_reason_other)
+    LedgerReason.FUEL -> stringResource(R.string.ledger_reason_fuel)
+    LedgerReason.TRANSPORT -> stringResource(R.string.ledger_reason_transport)
+    LedgerReason.WORKER -> stringResource(R.string.ledger_reason_worker)
 }

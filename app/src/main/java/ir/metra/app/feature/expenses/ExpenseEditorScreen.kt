@@ -18,6 +18,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.PhotoCamera
 import ir.metra.app.ui.components.ChoiceChips
 import ir.metra.app.ui.components.MetraButton
 import ir.metra.app.ui.components.MetraButtonLevel
@@ -72,6 +73,26 @@ fun ExpenseEditorScreen(
     val pickPhoto = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
     ) { uri -> if (uri != null) viewModel.attachPhoto(uri) }
+
+    // Camera capture: write to a FileProvider temp file, then copy into the
+    // receipt store on success. No CAMERA permission needed (delegates to the
+    // system camera app via ACTION_IMAGE_CAPTURE).
+    val context = androidx.compose.ui.platform.LocalContext.current
+    var cameraPhotoUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    val takePhoto = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture(),
+    ) { success -> if (success) cameraPhotoUri?.let { viewModel.attachPhoto(it) } }
+    val launchCamera: () -> Unit = {
+        val dir = java.io.File(context.cacheDir, "camera").apply { mkdirs() }
+        val file = java.io.File(dir, "receipt_${System.currentTimeMillis()}.jpg")
+        val uri = androidx.core.content.FileProvider.getUriForFile(
+            context,
+            context.packageName + ".fileprovider",
+            file,
+        )
+        cameraPhotoUri = uri
+        takePhoto.launch(uri)
+    }
 
     LaunchedEffect(workRecordId, expenseId) { viewModel.load(workRecordId, expenseId) }
     LaunchedEffect(state.saved) {
@@ -183,15 +204,34 @@ fun ExpenseEditorScreen(
                             modifier = Modifier.weight(1f),
                         )
                     }
-                } else {
+                    Spacer(Modifier.height(8.dp))
                     MetraButton(
-                        text = stringResource(R.string.expense_attach_photo),
-                        onClick = {
-                            pickPhoto.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                        },
-                        level = MetraButtonLevel.Secondary,
-                        icon = Icons.Filled.Image,
+                        text = stringResource(R.string.expense_take_photo),
+                        onClick = { launchCamera() },
+                        level = MetraButtonLevel.Outline,
+                        icon = Icons.Filled.PhotoCamera,
                     )
+                } else {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        MetraButton(
+                            text = stringResource(R.string.expense_pick_gallery),
+                            onClick = {
+                                pickPhoto.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                            },
+                            level = MetraButtonLevel.Secondary,
+                            icon = Icons.Filled.Image,
+                            fullWidth = false,
+                            modifier = Modifier.weight(1f),
+                        )
+                        MetraButton(
+                            text = stringResource(R.string.expense_take_photo),
+                            onClick = { launchCamera() },
+                            level = MetraButtonLevel.Secondary,
+                            icon = Icons.Filled.PhotoCamera,
+                            fullWidth = false,
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
                 }
                 if (state.dayExpenseTotalLabel.isNotEmpty()) {
                     StatRow(stringResource(R.string.expense_day_total), state.dayExpenseTotalLabel)

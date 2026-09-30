@@ -79,6 +79,8 @@ fun LedgerScreen(
             item {
                 OutstandingHero(
                     outstanding = state.outstandingText,
+                    work = state.workText,
+                    expenses = state.expensesText,
                     totalReceivable = state.totalReceivableText,
                     collected = state.collectedText,
                 )
@@ -120,6 +122,8 @@ fun LedgerScreen(
 @Composable
 private fun OutstandingHero(
     outstanding: String,
+    work: String,
+    expenses: String,
     totalReceivable: String,
     collected: String,
 ) {
@@ -146,6 +150,23 @@ private fun OutstandingHero(
                 color = scheme.onPrimary,
             )
             Spacer(Modifier.height(14.dp))
+            // «کل مطالبات» = کل کارکرد + کل هزینه‌ها؛ هر دو جزء جدا نشان داده می‌شوند.
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                HeroCell(
+                    label = stringResource(R.string.ledger_total_work),
+                    value = work,
+                    modifier = Modifier.weight(1f),
+                )
+                HeroCell(
+                    label = stringResource(R.string.ledger_total_expenses),
+                    value = expenses,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            Spacer(Modifier.height(12.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -252,4 +273,7 @@ private fun reasonLabel(reason: LedgerReason): String = when (reason) {
     LedgerReason.EXPENSE -> stringResource(R.string.ledger_reason_expense)
     LedgerReason.SALARY -> stringResource(R.string.ledger_reason_salary)
     LedgerReason.OTHER -> stringResource(R.string.ledger_reason_other)
+    LedgerReason.FUEL -> stringResource(R.string.ledger_reason_fuel)
+    LedgerReason.TRANSPORT -> stringResource(R.string.ledger_reason_transport)
+    LedgerReason.WORKER -> stringResource(R.string.ledger_reason_worker)
 }

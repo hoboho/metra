@@ -104,19 +104,23 @@ class StatisticsViewModel @Inject constructor(
         refresh()
     }
 
+    private var statsJob: kotlinx.coroutines.Job? = null
+
     private fun refresh() {
-        viewModelScope.launch {
-            val current = _state.value
-            val (range, statistics) = getPeriodStatistics.invoke(current.period, current.customRange)
-            _state.update {
-                it.copy(
-                    statistics = statistics,
-                    rangeLabel = dateFormatter.formatRange(range.start, range.end),
-                    kpis = buildKpis(statistics),
-                    loading = false,
-                )
+        statsJob?.cancel()
+        val current = _state.value
+        statsJob = viewModelScope.launch {
+            getPeriodStatistics.observe(current.period, current.customRange).collect { (range, statistics) ->
+                _state.update {
+                    it.copy(
+                        statistics = statistics,
+                        rangeLabel = dateFormatter.formatRange(range.start, range.end),
+                        kpis = buildKpis(statistics),
+                        loading = false,
+                    )
+                }
+                loadCharts(range)
             }
-            loadCharts(range)
         }
     }
 

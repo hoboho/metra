@@ -452,10 +452,15 @@
     <string name="ledger_kind">نوع عملیات</string>
     <string name="ledger_amount">مبلغ</string>
     <string name="ledger_reason">بابت</string>
-    <string name="ledger_reason_metraje">متراژ</string>
-    <string name="ledger_reason_expense">هزینه</string>
+    <string name="ledger_reason_metraje">کارکرد</string>
+    <string name="ledger_reason_expense">هزینه‌ها</string>
     <string name="ledger_reason_salary">حقوق</string>
     <string name="ledger_reason_other">سایر</string>
+    <string name="ledger_reason_fuel">هزینه سوخت</string>
+    <string name="ledger_reason_transport">هزینه حمل و نقل</string>
+    <string name="ledger_reason_worker">کارگر</string>
+    <string name="ledger_total_work">کل کارکرد</string>
+    <string name="ledger_total_expenses">کل هزینه‌ها</string>
     <string name="ledger_date">تاریخ</string>
     <string name="ledger_project">پروژه</string>
     <string name="ledger_project_all">همه پروژه‌ها</string>
@@ -472,6 +477,8 @@
     <string name="msg_report_saved">فایل گزارش ذخیره شد</string>
     <string name="report_save_pdf">ذخیره PDF در فایل</string>
     <string name="expense_attach_photo">پیوست تصویر رسید</string>
+    <string name="expense_pick_gallery">انتخاب از گالری</string>
+    <string name="expense_take_photo">گرفتن عکس با دوربین</string>
     <string name="expense_photo_attached">تصویر رسید ضمیمه شد</string>
     <string name="report_generate_excel">خروجی Excel</string>
     <string name="msg_xlsx_ready">فایل Excel آماده است</string>

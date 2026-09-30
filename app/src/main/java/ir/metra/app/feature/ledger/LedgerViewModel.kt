@@ -14,6 +14,7 @@ import ir.metra.app.core.i18n.StringProvider
 import ir.metra.app.domain.model.LedgerEntry
 import ir.metra.app.domain.model.LedgerKind
 import ir.metra.app.domain.model.LedgerReason
+import ir.metra.app.domain.model.reasonsFor
 import ir.metra.app.domain.repository.LedgerRepository
 import ir.metra.app.domain.repository.ProjectRepository
 import ir.metra.app.ui.navigation.LedgerEditorArgs
@@ -27,6 +28,8 @@ import javax.inject.Inject
 data class LedgerListUiState(
     val outstandingText: String = "",
     val totalReceivableText: String = "",
+    val workText: String = "",
+    val expensesText: String = "",
     val collectedText: String = "",
     val entries: List<LedgerRow> = emptyList(),
     val message: String? = null,
@@ -80,6 +83,8 @@ class LedgerViewModel @Inject constructor(
                     it.copy(
                         outstandingText = numberFormatter.formatToman(summary.outstanding),
                         totalReceivableText = numberFormatter.formatToman(summary.totalReceivable),
+                        workText = numberFormatter.formatToman(summary.totalWork),
+                        expensesText = numberFormatter.formatToman(summary.totalExpenses),
                         collectedText = numberFormatter.formatToman(summary.netCollected),
                     )
                 }
@@ -170,7 +175,10 @@ class LedgerEditorViewModel @Inject constructor(
         }
     }
 
-    fun onKindChange(kind: LedgerKind) = _state.update { it.copy(kind = kind) }
+    fun onKindChange(kind: LedgerKind) = _state.update {
+        val valid = reasonsFor(kind)
+        it.copy(kind = kind, reason = if (it.reason in valid) it.reason else valid.first())
+    }
     fun onAmountChange(value: String) =
         _state.update { it.copy(amount = value.filter(Char::isDigit).take(15), error = null) }
     fun onReasonChange(reason: LedgerReason) = _state.update { it.copy(reason = reason) }

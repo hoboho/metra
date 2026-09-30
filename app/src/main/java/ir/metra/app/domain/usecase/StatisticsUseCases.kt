@@ -9,6 +9,7 @@ import ir.metra.app.domain.MonthBucket
 import ir.metra.app.domain.StatisticsCalculator
 import ir.metra.app.domain.WorkStatistics
 import ir.metra.app.domain.WorkTotals
+import kotlinx.coroutines.flow.map
 import ir.metra.app.domain.model.WorkRecord
 import ir.metra.app.domain.repository.WorkRecordRepository
 import ir.metra.app.domain.repository.WorkStatisticsRepository
@@ -38,6 +39,21 @@ class GetPeriodStatistics @Inject constructor(
         val range = dateRangeResolver.resolve(period, todayEpochDay, custom)
         val records = collect(range)
         return range to StatisticsCalculator.calculate(records)
+    }
+
+    /**
+     * Reactive variant of [invoke]: re-emits whenever any work record in the
+     * resolved range changes (including its cached `expense_total`), so the
+     * statistics screen never shows a stale figure after an expense is added.
+     */
+    fun observe(
+        period: StatisticsPeriod,
+        custom: DateRange? = null,
+        todayEpochDay: Long = JalaliCalendar.today().toEpochDay(),
+    ): kotlinx.coroutines.flow.Flow<Pair<DateRange, WorkStatistics>> {
+        val range = dateRangeResolver.resolve(period, todayEpochDay, custom)
+        return workRecordRepository.observeRecordsInRange(range.start, range.end)
+            .map { records -> range to StatisticsCalculator.calculate(records) }
     }
 
     suspend fun totalsFor(range: DateRange): WorkTotals =

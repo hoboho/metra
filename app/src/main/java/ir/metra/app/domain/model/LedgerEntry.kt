@@ -22,6 +22,31 @@ enum class LedgerReason {
     EXPENSE,
     SALARY,
     OTHER,
+    FUEL,
+    TRANSPORT,
+    WORKER,
+}
+
+/**
+ * The «بابت» options that make sense for each kind of movement.
+ *
+ * A receipt from the company settles work, salary or reimbursed expenses; a
+ * personal payment is money the worker spent himself (fuel, transport, labour).
+ * Keeping the two lists apart stops the form offering nonsensical choices.
+ */
+fun reasonsFor(kind: LedgerKind): List<LedgerReason> = when (kind) {
+    LedgerKind.RECEIPT -> listOf(
+        LedgerReason.METRAJE,
+        LedgerReason.SALARY,
+        LedgerReason.EXPENSE,
+        LedgerReason.OTHER,
+    )
+    LedgerKind.PAYMENT -> listOf(
+        LedgerReason.FUEL,
+        LedgerReason.TRANSPORT,
+        LedgerReason.WORKER,
+        LedgerReason.OTHER,
+    )
 }
 
 data class LedgerEntry(
@@ -59,6 +84,10 @@ data class LedgerSummary(
     val totalReceivable: Long,
     /** Net of receipts minus personal payments. */
     val netCollected: Long,
+    /** The work component of [totalReceivable] (Metra's calculated meter payment). */
+    val totalWork: Long = 0L,
+    /** The reimbursable-expense component of [totalReceivable]. */
+    val totalExpenses: Long = 0L,
 ) {
     val outstanding: Long
         get() = totalReceivable - netCollected

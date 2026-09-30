@@ -52,6 +52,8 @@ class LedgerRepositoryImpl @Inject constructor(
             LedgerSummary(
                 totalReceivable = totals.totalReceivable,
                 netCollected = collected,
+                totalWork = totals.totalAdditionalPayment,
+                totalExpenses = totals.totalExpenses,
             )
         }
 
@@ -63,6 +65,8 @@ class LedgerRepositoryImpl @Inject constructor(
             LedgerSummary(
                 totalReceivable = totals.totalReceivable,
                 netCollected = collected,
+                totalWork = totals.totalAdditionalPayment,
+                totalExpenses = totals.totalExpenses,
             )
         }
 

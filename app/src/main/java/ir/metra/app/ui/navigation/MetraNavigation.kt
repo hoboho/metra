@@ -35,7 +35,6 @@ import ir.metra.app.R
 import ir.metra.app.feature.ledger.LedgerScreen
 import ir.metra.app.feature.ledger.LedgerEditorScreen
 import ir.metra.app.feature.dashboard.DashboardScreen
-import ir.metra.app.feature.expenses.ExpenseEditorScreen
 import ir.metra.app.feature.projects.ProjectEditorScreen
 import ir.metra.app.feature.projects.ProjectsScreen
 import ir.metra.app.feature.reports.ReportsScreen
@@ -88,9 +87,6 @@ data class WorkEditorArgs(
     /** True when opened from the "log today" shortcut. */
     val todayShortcut: Boolean = false,
 )
-
-@Serializable
-data class ExpenseEditorArgs(val workRecordId: Long, val expenseId: Long = 0L)
 
 @Serializable
 data object PaymentRulesRoute
@@ -186,18 +182,7 @@ fun MetraNavHost(
                 epochDay = args.epochDay,
                 todayShortcut = args.todayShortcut,
                 onDone = { navController.popBackStack() },
-                onOpenExpenseEditor = { recordId, expenseId ->
-                    navController.navigate(ExpenseEditorArgs(workRecordId = recordId, expenseId = expenseId))
-                },
                 onOpenProjects = { navController.navigate(ProjectsRoute) },
-            )
-        }
-        composable<ExpenseEditorArgs> { entry ->
-            val args = entry.toRoute<ExpenseEditorArgs>()
-            ExpenseEditorScreen(
-                workRecordId = args.workRecordId,
-                expenseId = args.expenseId,
-                onDone = { navController.popBackStack() },
             )
         }
         composable<PaymentRulesRoute> { PaymentRulesScreen() }

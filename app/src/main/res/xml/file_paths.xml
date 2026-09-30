@@ -5,5 +5,4 @@
     <files-path name="internal_reports" path="reports/" />
     <external-files-path name="external_reports" path="reports/" />
     <cache-path name="backups" path="backups/" />
-    <cache-path name="camera" path="camera/" />
 </paths>

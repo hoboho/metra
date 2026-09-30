@@ -78,7 +78,6 @@ fun WorkEditorScreen(
     epochDay: Long?,
     todayShortcut: Boolean,
     onDone: () -> Unit,
-    onOpenExpenseEditor: (Long, Long) -> Unit,
     onOpenProjects: () -> Unit,
     viewModel: WorkEditorViewModel = hiltViewModel(),
 ) {

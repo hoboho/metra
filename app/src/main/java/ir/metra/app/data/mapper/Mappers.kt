@@ -140,7 +140,6 @@ fun ExpenseEntity.toDomain(): Expense = Expense(
     amount = amount,
     category = runCatching { ExpenseCategory.valueOf(category) }.getOrDefault(ExpenseCategory.OTHER),
     description = description,
-    receiptPhotoUri = receiptPhotoUri,
     createdAtEpochMilli = createdAtEpochMilli,
 )
 
@@ -150,7 +149,6 @@ fun Expense.toEntity(): ExpenseEntity = ExpenseEntity(
     amount = amount,
     category = category.name,
     description = description.trim(),
-    receiptPhotoUri = receiptPhotoUri,
     createdAtEpochMilli = createdAtEpochMilli,
 )
 

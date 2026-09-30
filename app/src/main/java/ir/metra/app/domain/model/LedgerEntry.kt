@@ -5,8 +5,8 @@ package ir.metra.app.domain.model
  *
  * Metra keeps accounting deliberately minimal: the only number the app owes the
  * user is "how much is the company still holding?". A [RECEIPT] answers part of
- * that; a [PAYMENT] records money the worker put in himself so the ledger stays
- * honest when he buys, say, a blade out of pocket.
+ * that. The legacy [PAYMENT] kind remains readable for old records, but new
+ * personal expenses are recorded in the workday expense section.
  */
 enum class LedgerKind {
     /** The company paid the worker. Reduces what is outstanding. */
@@ -30,9 +30,9 @@ enum class LedgerReason {
 /**
  * The «بابت» options that make sense for each kind of movement.
  *
- * A receipt from the company settles work, salary or reimbursed expenses; a
- * personal payment is money the worker spent himself (fuel, transport, labour).
- * Keeping the two lists apart stops the form offering nonsensical choices.
+ * A receipt from the company settles work, salary or reimbursed expenses. The
+ * legacy personal-payment list is retained only so old records remain readable;
+ * the editor no longer offers that operation to create new entries.
  */
 fun reasonsFor(kind: LedgerKind): List<LedgerReason> = when (kind) {
     LedgerKind.RECEIPT -> listOf(

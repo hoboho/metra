@@ -12,7 +12,6 @@ data class Expense(
     val amount: Long,
     val category: ExpenseCategory,
     val description: String = "",
-    val receiptPhotoUri: String? = null,
     val createdAtEpochMilli: Long,
 ) {
     init {

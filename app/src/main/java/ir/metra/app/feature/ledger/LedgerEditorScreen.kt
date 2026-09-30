@@ -85,24 +85,6 @@ fun LedgerEditorScreen(
             contentPadding = PaddingValues(14.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            // ------------------------------------------------------- kind
-            item {
-                FieldLabel(stringResource(R.string.ledger_kind))
-                Spacer(Modifier.height(6.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    FilterChip(
-                        selected = state.kind == LedgerKind.RECEIPT,
-                        onClick = { viewModel.onKindChange(LedgerKind.RECEIPT) },
-                        label = { Text(stringResource(R.string.ledger_receipt)) },
-                    )
-                    FilterChip(
-                        selected = state.kind == LedgerKind.PAYMENT,
-                        onClick = { viewModel.onKindChange(LedgerKind.PAYMENT) },
-                        label = { Text(stringResource(R.string.ledger_payment)) },
-                    )
-                }
-            }
-
             // ----------------------------------------------------- amount
             item {
                 MetraNumberField(

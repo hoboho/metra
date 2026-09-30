@@ -32,6 +32,5 @@ data class ExpenseEntity(
     /** Persisted as the enum name so the ordinal can never shift meaning. */
     @ColumnInfo(name = "category") val category: String,
     @ColumnInfo(name = "description") val description: String = "",
-    @ColumnInfo(name = "receipt_photo_uri") val receiptPhotoUri: String? = null,
     @ColumnInfo(name = "created_at") val createdAtEpochMilli: Long,
 )

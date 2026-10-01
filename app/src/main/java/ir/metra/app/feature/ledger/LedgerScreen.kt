@@ -207,8 +207,9 @@ private fun HeroCell(label: String, value: String, modifier: Modifier = Modifier
 private fun LedgerRowCard(row: LedgerRow, onClick: () -> Unit) {
     val scheme = MaterialTheme.colorScheme
     val isReceipt = row.kind == LedgerKind.RECEIPT
-    val accent = if (isReceipt) scheme.primary else scheme.error
-    val accentSoft = if (isReceipt) {
+    val isPositive = row.kind == LedgerKind.RECEIPT || row.kind == LedgerKind.CLAIM
+    val accent = if (isPositive) scheme.primary else scheme.error
+    val accentSoft = if (isPositive) {
         scheme.primary.copy(alpha = 0.12f)
     } else {
         scheme.error.copy(alpha = 0.12f)
@@ -236,7 +237,7 @@ private fun LedgerRowCard(row: LedgerRow, onClick: () -> Unit) {
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    text = if (isReceipt) "↓" else "↑",
+                    text = if (isReceipt) "↓" else "＋",
                     style = MaterialTheme.typography.titleMedium,
                     color = accent,
                     fontWeight = FontWeight.Bold,
@@ -259,7 +260,7 @@ private fun LedgerRowCard(row: LedgerRow, onClick: () -> Unit) {
             }
             Spacer(Modifier.width(8.dp))
             Text(
-                text = if (isReceipt) row.amountText else "−${row.amountText}",
+                text = if (row.kind == LedgerKind.PAYMENT) "−${row.amountText}" else row.amountText,
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 color = accent,
             )
@@ -276,4 +277,5 @@ private fun reasonLabel(reason: LedgerReason): String = when (reason) {
     LedgerReason.FUEL -> stringResource(R.string.ledger_reason_fuel)
     LedgerReason.TRANSPORT -> stringResource(R.string.ledger_reason_transport)
     LedgerReason.WORKER -> stringResource(R.string.ledger_reason_worker)
+    LedgerReason.OUTSIDE_PROJECT -> stringResource(R.string.ledger_reason_outside_project)
 }

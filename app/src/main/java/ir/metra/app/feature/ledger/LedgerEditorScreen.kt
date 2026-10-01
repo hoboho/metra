@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -25,6 +26,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -35,11 +39,13 @@ import ir.metra.app.R
 import ir.metra.app.domain.model.LedgerKind
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notes
+import androidx.compose.material.icons.filled.CalendarToday
 import ir.metra.app.domain.model.reasonsFor
 import ir.metra.app.ui.components.ChoiceChips
 import ir.metra.app.ui.components.MetraButton
 import ir.metra.app.ui.components.MetraNumberField
 import ir.metra.app.ui.components.MetraTextField
+import ir.metra.app.ui.components.JalaliDatePickerDialog
 import ir.metra.app.domain.model.LedgerReason
 
 /** Toman amounts offered as one-tap chips so a receipt takes two taps, not ten. */
@@ -60,6 +66,7 @@ fun LedgerEditorScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val projects by viewModel.projectNames.collectAsStateWithLifecycle()
+    var showDatePicker by remember { mutableStateOf(false) }
 
     LaunchedEffect(state.saved) {
         if (state.saved) onDone()
@@ -69,11 +76,25 @@ fun LedgerEditorScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        stringResource(
-                            if (state.entryId == 0L) R.string.ledger_add else R.string.ledger_edit,
-                        ),
-                    )
+                    Column {
+                        Text(
+                            stringResource(
+                                when {
+                                    state.entryId != 0L -> R.string.ledger_edit
+                                    state.kind == LedgerKind.CLAIM -> R.string.ledger_add_claim
+                                    else -> R.string.ledger_add
+                                },
+                            ),
+                        )
+                        Text(
+                            text = stringResource(
+                                if (state.kind == LedgerKind.CLAIM) R.string.ledger_claim_subtitle
+                                else R.string.ledger_subtitle,
+                            ),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 },
             )
         },
@@ -85,6 +106,20 @@ fun LedgerEditorScreen(
             contentPadding = PaddingValues(14.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            // ------------------------------------------------------- operation
+            item {
+                FieldLabel(stringResource(R.string.ledger_kind))
+                Spacer(Modifier.height(6.dp))
+                ChoiceChips(
+                    options = listOf(LedgerKind.RECEIPT, LedgerKind.CLAIM),
+                    selected = state.kind,
+                    onSelected = { viewModel.onKindChange(it) },
+                    labelOf = { kind ->
+                        stringResource(if (kind == LedgerKind.RECEIPT) R.string.ledger_receipt else R.string.ledger_claim)
+                    },
+                )
+            }
+
             // ----------------------------------------------------- amount
             item {
                 MetraNumberField(
@@ -92,6 +127,7 @@ fun LedgerEditorScreen(
                     onValueChange = viewModel::onAmountChange,
                     label = stringResource(R.string.ledger_amount),
                     suffix = stringResource(R.string.toman),
+                    groupThousands = true,
                     isError = state.error != null,
                     errorMessage = state.error,
                 )
@@ -128,7 +164,9 @@ fun LedgerEditorScreen(
                 FieldLabel(stringResource(R.string.ledger_date))
                 Spacer(Modifier.height(6.dp))
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { showDatePicker = true },
                     shape = RoundedCornerShape(12.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -193,7 +231,10 @@ fun LedgerEditorScreen(
                 MetraTextField(
                     value = state.notes,
                     onValueChange = viewModel::onNotesChange,
-                    label = stringResource(R.string.ledger_notes),
+                    label = stringResource(
+                        if (state.reason == LedgerReason.OTHER) R.string.ledger_other_details
+                        else R.string.ledger_notes,
+                    ),
                     minLines = 2,
                     leadingIcon = Icons.Filled.Notes,
                 )
@@ -206,6 +247,14 @@ fun LedgerEditorScreen(
                 )
             }
         }
+    }
+
+    if (showDatePicker) {
+        JalaliDatePickerDialog(
+            initialEpochDay = state.dateEpochDay,
+            onDismiss = { showDatePicker = false },
+            onDateSelected = { viewModel.onDateChange(it) },
+        )
     }
 }
 
@@ -227,4 +276,5 @@ private fun reasonLabel(reason: LedgerReason): String = when (reason) {
     LedgerReason.FUEL -> stringResource(R.string.ledger_reason_fuel)
     LedgerReason.TRANSPORT -> stringResource(R.string.ledger_reason_transport)
     LedgerReason.WORKER -> stringResource(R.string.ledger_reason_worker)
+    LedgerReason.OUTSIDE_PROJECT -> stringResource(R.string.ledger_reason_outside_project)
 }

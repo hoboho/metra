@@ -12,8 +12,11 @@ enum class LedgerKind {
     /** The company paid the worker. Reduces what is outstanding. */
     RECEIPT,
 
-    /** The worker spent his own money on the job. Increases what is outstanding. */
+    /** The worker spent his own money on the job. Legacy only. */
     PAYMENT,
+
+    /** A manually entered claim for salary or an expense outside a project. */
+    CLAIM,
 }
 
 /** What a ledger movement settled. Purely a label for the user's own reading. */
@@ -25,6 +28,7 @@ enum class LedgerReason {
     FUEL,
     TRANSPORT,
     WORKER,
+    OUTSIDE_PROJECT,
 }
 
 /**
@@ -46,6 +50,10 @@ fun reasonsFor(kind: LedgerKind): List<LedgerReason> = when (kind) {
         LedgerReason.TRANSPORT,
         LedgerReason.WORKER,
         LedgerReason.OTHER,
+    )
+    LedgerKind.CLAIM -> listOf(
+        LedgerReason.SALARY,
+        LedgerReason.OUTSIDE_PROJECT,
     )
 }
 
@@ -69,7 +77,7 @@ data class LedgerEntry(
 
     /** Signed contribution to the outstanding balance. */
     val signedAmount: Long
-        get() = if (kind == LedgerKind.RECEIPT) amount else -amount
+        get() = if (kind == LedgerKind.RECEIPT || kind == LedgerKind.CLAIM) amount else -amount
 }
 
 /**

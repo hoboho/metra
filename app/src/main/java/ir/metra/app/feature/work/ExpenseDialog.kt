@@ -66,6 +66,7 @@ fun ExpenseDialog(
                     onValueChange = { amount = it },
                     label = stringResource(R.string.expense_amount),
                     suffix = stringResource(R.string.toman),
+            groupThousands = true,
                 )
                 Spacer(Modifier.height(12.dp))
                 ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {

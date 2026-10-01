@@ -163,6 +163,7 @@ private fun NewRuleDialog(
                     onValueChange = { rate = it },
                     label = stringResource(R.string.settings_rate),
                     suffix = stringResource(R.string.toman),
+            groupThousands = true,
                 )
                 Spacer(Modifier.height(8.dp))
                 MetraButton(

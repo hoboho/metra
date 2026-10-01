@@ -51,9 +51,11 @@ fun MetraNumberField(
     enabled: Boolean = true,
     readOnly: Boolean = false,
     singleLine: Boolean = true,
+    /** Shows thousands separators while keeping the callback value unformatted. */
+    groupThousands: Boolean = false,
 ) {
     OutlinedTextField(
-        value = PersianDigits.toPersian(value),
+        value = if (groupThousands) PersianDigits.toPersianGrouped(value) else PersianDigits.toPersian(value),
         onValueChange = { raw -> onValueChange(PersianDigits.normalizeNumberInput(raw).removeSuffix(".")) },
         label = { Text(label) },
         placeholder = { if (placeholder.isNotEmpty()) Text(placeholder) },

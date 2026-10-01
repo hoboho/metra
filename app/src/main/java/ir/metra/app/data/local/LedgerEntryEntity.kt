@@ -29,7 +29,7 @@ import androidx.room.PrimaryKey
 data class LedgerEntryEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
 
-    /** `RECEIPT` (company paid the worker) or `PAYMENT` (worker spent own money). */
+    /** `RECEIPT` (company paid the worker), `CLAIM` (manual salary/outside-project claim), or legacy `PAYMENT`. */
     @ColumnInfo(name = "kind") val kind: String,
 
     /** Always stored positive; the sign is implied by [kind]. */

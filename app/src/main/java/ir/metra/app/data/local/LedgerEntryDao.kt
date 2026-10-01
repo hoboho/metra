@@ -36,7 +36,7 @@ interface LedgerEntryDao {
      */
     @Query(
         """
-        SELECT COALESCE(SUM(CASE WHEN kind = 'RECEIPT' THEN amount ELSE -amount END), 0)
+        SELECT COALESCE(SUM(CASE WHEN kind = 'RECEIPT' THEN amount WHEN kind = 'PAYMENT' THEN -amount ELSE 0 END), 0)
         FROM ledger_entries
         """,
     )
@@ -44,12 +44,19 @@ interface LedgerEntryDao {
 
     @Query(
         """
-        SELECT COALESCE(SUM(CASE WHEN kind = 'RECEIPT' THEN amount ELSE -amount END), 0)
+        SELECT COALESCE(SUM(CASE WHEN kind = 'RECEIPT' THEN amount WHEN kind = 'PAYMENT' THEN -amount ELSE 0 END), 0)
         FROM ledger_entries
         WHERE entry_date_epoch_day BETWEEN :fromDay AND :toDay
         """,
     )
     fun observeNetCollectedBetween(fromDay: Long, toDay: Long): Flow<Long>
+
+    /** Manual claims (salary or outside-project expenses) increase receivables. */
+    @Query("SELECT COALESCE(SUM(CASE WHEN kind = 'CLAIM' THEN amount ELSE 0 END), 0) FROM ledger_entries")
+    fun observeClaimTotal(): Flow<Long>
+
+    @Query("SELECT COALESCE(SUM(CASE WHEN kind = 'CLAIM' THEN amount ELSE 0 END), 0) FROM ledger_entries WHERE entry_date_epoch_day BETWEEN :fromDay AND :toDay")
+    fun observeClaimTotalBetween(fromDay: Long, toDay: Long): Flow<Long>
 
     @Query("SELECT * FROM ledger_entries WHERE id = :id")
     suspend fun getById(id: Long): LedgerEntryEntity?

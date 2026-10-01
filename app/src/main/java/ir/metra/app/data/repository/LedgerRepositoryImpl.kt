@@ -48,9 +48,10 @@ class LedgerRepositoryImpl @Inject constructor(
         combine(
             statisticsRepository.observeTotals(ALL_TIME_FROM_DAY, ALL_TIME_TO_DAY),
             ledgerDao.observeNetCollected(),
-        ) { totals, collected ->
+            ledgerDao.observeClaimTotal(),
+        ) { totals, collected, claims ->
             LedgerSummary(
-                totalReceivable = totals.totalReceivable,
+                totalReceivable = totals.totalReceivable + claims,
                 netCollected = collected,
                 totalWork = totals.totalAdditionalPayment,
                 totalExpenses = totals.totalExpenses,
@@ -61,9 +62,10 @@ class LedgerRepositoryImpl @Inject constructor(
         combine(
             statisticsRepository.observeTotals(fromDay, toDay),
             ledgerDao.observeNetCollectedBetween(fromDay, toDay),
-        ) { totals, collected ->
+            ledgerDao.observeClaimTotalBetween(fromDay, toDay),
+        ) { totals, collected, claims ->
             LedgerSummary(
-                totalReceivable = totals.totalReceivable,
+                totalReceivable = totals.totalReceivable + claims,
                 netCollected = collected,
                 totalWork = totals.totalAdditionalPayment,
                 totalExpenses = totals.totalExpenses,

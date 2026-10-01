@@ -13,6 +13,17 @@ object PersianDigits {
     private const val PERSIAN_THOUSANDS_SEPARATOR = '٬' // U+066C ARABIC THOUSANDS SEPARATOR
     private const val PERSIAN_DECIMAL_SEPARATOR = '٫' // U+066B ARABIC DECIMAL SEPARATOR
 
+    /** Formats an integer input with Persian thousands separators for readable money fields. */
+    fun toPersianGrouped(input: String): String {
+        val normalized = normalizeNumberInput(input)
+        if (normalized.isEmpty()) return ""
+        val parts = normalized.split('.', limit = 2)
+        val digits = parts[0]
+        val grouped = digits.reversed().chunked(3).joinToString("٬").reversed()
+        val result = if (parts.size == 2) "$grouped.${parts[1]}" else grouped
+        return toPersian(result)
+    }
+
     /** Converts ASCII digits to their Persian equivalents, leaving other text alone. */
     fun toPersian(input: String): String {
         if (input.isEmpty()) return input

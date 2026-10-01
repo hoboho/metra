@@ -56,7 +56,14 @@ fun MetraNumberField(
 ) {
     OutlinedTextField(
         value = if (groupThousands) PersianDigits.toPersianGrouped(value) else PersianDigits.toPersian(value),
-        onValueChange = { raw -> onValueChange(PersianDigits.normalizeNumberInput(raw).removeSuffix(".")) },
+        onValueChange = { raw ->
+            val normalized = if (groupThousands) {
+                PersianDigits.normalizeGroupedNumberInput(raw)
+            } else {
+                PersianDigits.normalizeNumberInput(raw)
+            }
+            onValueChange(normalized.removeSuffix("."))
+        },
         label = { Text(label) },
         placeholder = { if (placeholder.isNotEmpty()) Text(placeholder) },
         suffix = suffix?.let { { Text(it) } },

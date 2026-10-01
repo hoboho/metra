@@ -14,6 +14,8 @@ import ir.metra.app.domain.model.ExpenseCategory
 import ir.metra.app.domain.model.ReportType
 import ir.metra.app.domain.model.UserProfile
 import ir.metra.app.domain.repository.ProjectRepository
+import ir.metra.app.domain.repository.LedgerRepository
+import ir.metra.app.domain.model.LedgerKind
 import ir.metra.app.domain.repository.UserRepository
 import ir.metra.app.domain.repository.WorkRecordRepository
 import ir.metra.app.domain.repository.WorkStatisticsRepository
@@ -31,6 +33,7 @@ class ReportBuilder @Inject constructor(
     private val workRecordRepository: WorkRecordRepository,
     private val statisticsRepository: WorkStatisticsRepository,
     private val projectRepository: ProjectRepository,
+    private val ledgerRepository: LedgerRepository,
     private val userRepository: UserRepository,
     private val dateFormatter: DateFormatter,
     private val numberFormatter: NumberFormatter,
@@ -48,6 +51,18 @@ class ReportBuilder @Inject constructor(
             projectId = request.projectId,
         )
         val records = collectRecords(request)
+        val ledgerEntries = ledgerRepository.getEntries().filter {
+            it.entryDateEpochDay in request.startEpochDay..request.endEpochDay
+        }
+        val ledgerClaims = ledgerEntries.filter { it.kind == LedgerKind.CLAIM }.sumOf { it.amount }
+        val ledgerReceived = ledgerEntries.filter { it.kind == LedgerKind.RECEIPT }.sumOf { it.amount }
+        val legacyPayments = ledgerEntries.filter { it.kind == LedgerKind.PAYMENT }.sumOf { it.amount }
+        val ledgerReceivable = totals.totalReceivable + ledgerClaims
+        val ledger = ReportLedgerTotals(
+            totalReceivable = ledgerReceivable,
+            totalReceived = ledgerReceived,
+            outstanding = ledgerReceivable - ledgerReceived + legacyPayments,
+        )
         val projectBreakdown = if (request.includeProjectBreakdown) {
             statisticsRepository.getProjectBreakdown(request.startEpochDay, request.endEpochDay)
         } else {
@@ -69,6 +84,7 @@ class ReportBuilder @Inject constructor(
             endEpochDay = request.endEpochDay,
             profile = profile,
             totals = totals,
+            ledger = ledger,
             records = records,
             projectBreakdown = projectBreakdown,
             expensesByCategory = expensesByCategory,

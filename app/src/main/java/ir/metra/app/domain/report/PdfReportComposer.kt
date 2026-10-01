@@ -69,13 +69,15 @@ class PdfReportComposer @Inject constructor(
         // Expenses are reimbursable, so they are owed *to* the worker rather than
         // deducted. Company salary is not tracked by Metra at all.
         val recordedEntries = linkedMapOf(
-            "جمع مبلغ متراژ اضافه" to numberFormatter.formatToman(totals.totalAdditionalPayment),
-            "هزینه‌های قابل مطالبه" to numberFormatter.formatToman(totals.totalExpenses),
-            "جمع مطالبات" to numberFormatter.formatToman(totals.totalReceivable),
+            "مبلغ کارکرد مازاد" to numberFormatter.formatToman(totals.totalAdditionalPayment),
+            "هزینه‌های داخل پروژه" to numberFormatter.formatToman(totals.totalExpenses),
+            "کل مطالبات" to numberFormatter.formatToman(data.ledger.totalReceivable),
+            "کل دریافتی از شرکت" to numberFormatter.formatToman(data.ledger.totalReceived),
+            "مانده مطالبات" to numberFormatter.formatToman(data.ledger.outstanding),
         )
         blocks += PdfBlock.KeyValueList(
             entries = recordedEntries.entries.map { it.key to it.value },
-            emphasisedLabels = setOf("جمع مطالبات"),
+            emphasisedLabels = setOf("کل مطالبات", "مانده مطالبات"),
         )
 
         // ------------------------------------------------ project / expenses

@@ -187,7 +187,10 @@
     <string name="report_period">بازهٔ گزارش</string>
     <string name="report_preparing">در حال آماده‌سازی گزارش…</string>
     <string name="report_ready">گزارش آمادهٔ اشتراک‌گذاری است</string>
-    <string name="report_summary">خلاصه</string>
+    <string name="report_summary">خلاصهٔ مالی گزارش</string>
+    <string name="report_total_receivable">کل مطالبات</string>
+    <string name="report_total_received">کل دریافتی از شرکت</string>
+    <string name="report_outstanding">مانده مطالبات</string>
     <string name="report_no_data">در این بازه رکوردی وجود ندارد</string>
 
     <!-- Statistics -->

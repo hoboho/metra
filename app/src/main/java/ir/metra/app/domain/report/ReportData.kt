@@ -12,6 +12,12 @@ import ir.metra.app.domain.model.WorkRecord
  *
  * Pure Kotlin and free of Android types so report content is unit-testable.
  */
+data class ReportLedgerTotals(
+    val totalReceivable: Long = 0L,
+    val totalReceived: Long = 0L,
+    val outstanding: Long = 0L,
+)
+
 data class ReportData(
     val type: ReportType,
     val title: String,
@@ -20,6 +26,7 @@ data class ReportData(
     val endEpochDay: Long,
     val profile: UserProfile,
     val totals: WorkTotals,
+    val ledger: ReportLedgerTotals,
     val records: List<WorkRecord>,
     val projectBreakdown: List<ProjectSummary>,
     val expensesByCategory: Map<ExpenseCategory, Long>,

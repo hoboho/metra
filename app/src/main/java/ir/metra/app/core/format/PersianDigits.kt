@@ -13,9 +13,21 @@ object PersianDigits {
     private const val PERSIAN_THOUSANDS_SEPARATOR = '٬' // U+066C ARABIC THOUSANDS SEPARATOR
     private const val PERSIAN_DECIMAL_SEPARATOR = '٫' // U+066B ARABIC DECIMAL SEPARATOR
 
+    /** Normalizes a grouped money field without mistaking a thousands comma for a decimal. */
+    fun normalizeGroupedNumberInput(input: String): String {
+        val latin = toLatin(input)
+        val decimalIndex = latin.indexOf('.')
+        return if (decimalIndex >= 0) {
+            latin.substring(0, decimalIndex).filter(Char::isDigit) + "." +
+                latin.substring(decimalIndex + 1).filter(Char::isDigit)
+        } else {
+            latin.filter(Char::isDigit)
+        }
+    }
+
     /** Formats an integer input with Persian thousands separators for readable money fields. */
     fun toPersianGrouped(input: String): String {
-        val normalized = normalizeNumberInput(input)
+        val normalized = normalizeGroupedNumberInput(input)
         if (normalized.isEmpty()) return ""
         val parts = normalized.split('.', limit = 2)
         val digits = parts[0]

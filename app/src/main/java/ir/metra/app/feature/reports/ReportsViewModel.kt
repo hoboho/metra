@@ -21,6 +21,8 @@ import ir.metra.app.domain.model.ReportType
 import ir.metra.app.domain.report.ReportFileWriter
 import ir.metra.app.domain.report.ReportRequest
 import ir.metra.app.domain.repository.ProjectRepository
+import ir.metra.app.domain.repository.LedgerRepository
+import kotlinx.coroutines.flow.first
 import ir.metra.app.domain.repository.WorkStatisticsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,6 +58,8 @@ data class ReportsUiState(
         val additionalMeters: String = "",
         val additionalPayment: String = "",
         val recordedIncome: String = "",
+        val totalReceived: String = "",
+        val outstanding: String = "",
         val expenses: String = "",
 
     ) {
@@ -79,6 +83,7 @@ class ReportsViewModel @Inject constructor(
     private val fileSharer: FileSharer,
     private val statisticsRepository: WorkStatisticsRepository,
     private val projectRepository: ProjectRepository,
+    private val ledgerRepository: LedgerRepository,
     private val dateFormatter: DateFormatter,
     private val numberFormatter: NumberFormatter,
     private val strings: StringProvider,
@@ -377,17 +382,20 @@ class ReportsViewModel @Inject constructor(
                 endEpochDay = current.endEpochDay,
                 projectId = if (current.reportType == ReportType.PROJECT) current.selectedProjectId else null,
             )
-            _state.update { it.copy(totals = totals, totalsUi = totals.toUi()) }
+            val ledger = ledgerRepository.observeSummaryBetween(current.startEpochDay, current.endEpochDay).first()
+            _state.update { it.copy(totals = totals, totalsUi = totals.toUi(ledger)) }
         }
     }
 
-    private fun WorkTotals.toUi(): ReportsUiState.TotalsUi = ReportsUiState.TotalsUi(
+    private fun WorkTotals.toUi(ledger: ir.metra.app.domain.model.LedgerSummary): ReportsUiState.TotalsUi = ReportsUiState.TotalsUi(
         workdays = numberFormatter.formatPersian(workdays.toLong()),
         meters = numberFormatter.formatMetersValue(totalMeters),
         average = numberFormatter.formatAverage(averageMetersPerDay),
         additionalMeters = numberFormatter.formatMetersValue(totalAdditionalMeters),
         additionalPayment = numberFormatter.formatToman(totalAdditionalPayment),
-        recordedIncome = numberFormatter.formatToman(totalReceivable),
+        recordedIncome = numberFormatter.formatToman(ledger.totalReceivable),
+        totalReceived = numberFormatter.formatToman(ledger.netCollected),
+        outstanding = numberFormatter.formatToman(ledger.outstanding),
         expenses = numberFormatter.formatToman(totalExpenses),
 
     )

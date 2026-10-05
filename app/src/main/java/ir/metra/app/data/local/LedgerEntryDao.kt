@@ -70,6 +70,9 @@ interface LedgerEntryDao {
     @Query("DELETE FROM ledger_entries WHERE id = :id")
     suspend fun deleteById(id: Long)
 
+    @Query("DELETE FROM ledger_entries")
+    suspend fun deleteAll()
+
     @Query("SELECT COUNT(*) FROM ledger_entries")
     suspend fun count(): Int
 }

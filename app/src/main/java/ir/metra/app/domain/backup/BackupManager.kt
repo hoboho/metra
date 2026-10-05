@@ -4,6 +4,7 @@ import ir.metra.app.data.preferences.ThemeMode
 import ir.metra.app.data.preferences.UserPreferencesRepository
 import ir.metra.app.core.notification.ReminderScheduler
 import kotlinx.coroutines.flow.first
+import androidx.room.withTransaction
 import ir.metra.app.core.backup.PreferencesDto
 import ir.metra.app.core.backup.toDomain
 import ir.metra.app.core.backup.AppSettingsDto
@@ -27,6 +28,7 @@ import ir.metra.app.core.common.failure
 import ir.metra.app.core.common.success
 import ir.metra.app.core.format.DateFormatter
 import ir.metra.app.data.local.BackupMetadataDao
+import ir.metra.app.data.local.MetraDatabase
 import ir.metra.app.data.local.BackupMetadataEntity
 import ir.metra.app.domain.model.AppSettings
 import ir.metra.app.domain.model.Expense
@@ -74,6 +76,7 @@ class BackupManager @Inject constructor(
     private val preferencesRepository: UserPreferencesRepository,
     private val reminderScheduler: ReminderScheduler,
     private val backupMetadataDao: BackupMetadataDao,
+    private val database: MetraDatabase,
     private val backupCipher: BackupCipher,
     private val dateFormatter: DateFormatter,
     private val clock: Clock,
@@ -180,7 +183,12 @@ class BackupManager @Inject constructor(
         val payload = readPayload(sourceFile, passphrase).getOrThrow()
         val existingProjects = projectRepository.getProjects().size
         val existingRecords = workRecordRepository.countAll()
-        val existingExpenses = payload.expenses.size // placeholder refined below
+        val existingExpenses = workRecordRepository.getRecordsInRangeAscending(
+            Long.MIN_VALUE / 4,
+            Long.MAX_VALUE / 4,
+        ).let { records ->
+            records.sumOf { workRecordRepository.getRecordWithExpenses(it.id)?.second?.size ?: 0 }
+        }
         success(
             RestorePreview(
                 formatVersion = payload.formatVersion,
@@ -229,8 +237,12 @@ class BackupManager @Inject constructor(
 
         // 2. Optionally clear current data.
         if (strategy == RestoreStrategy.REPLACE) {
-            for (project in projectRepository.getProjects()) {
-                projectRepository.delete(project.id).getOrThrow()
+            database.withTransaction {
+                database.expenseDao().deleteAll()
+                database.workRecordDao().deleteAll()
+                database.ledgerEntryDao().deleteAll()
+                database.paymentRuleDao().deleteAll()
+                database.projectDao().deleteAll()
             }
         }
 
@@ -281,7 +293,7 @@ class BackupManager @Inject constructor(
         // 4. Payment rules: append versions that are not already present.
         val existingRuleKeys = paymentRuleRepository.getRules()
             .map { it.effectiveFromEpochDay to it.ratePerMeter }
-            .toSet()
+            .toMutableSet()
         var rulesImported = 0
         for (dto in payload.paymentRules) {
             val key = dto.effectiveFromEpochDay to dto.ratePerMeter
@@ -296,13 +308,26 @@ class BackupManager @Inject constructor(
                     createdAtEpochMilli = dto.createdAtEpochMilli,
                 ),
             ).getOrThrow()
+            existingRuleKeys += key
             rulesImported += 1
         }
 
-        // 5. Work records. Snapshots are copied verbatim so history is never
-        //    re-priced by the rules that happen to be current today.
+        // 5. Work records. A natural key prevents ADD_ONLY and MERGE from
+        // duplicating the same workday when the backup is restored repeatedly.
+        val existingRecords = workRecordRepository.getRecordsInRangeAscending(
+            Long.MIN_VALUE / 4,
+            Long.MAX_VALUE / 4,
+        ).toMutableList()
+        fun recordKey(record: WorkRecord): String = listOf(
+            record.workDateEpochDay,
+            record.projectName,
+            record.dailyMeters,
+            record.additionalMeters,
+        ).joinToString("|")
+        val existingByKey = existingRecords.associateBy { recordKey(it) }.toMutableMap()
         var recordsImported = 0
         val newRecordIds = LongArray(payload.workRecords.size)
+        val recordWasImported = BooleanArray(payload.workRecords.size)
         for ((index, dto) in payload.workRecords.withIndex()) {
             val record = WorkRecord(
                 projectId = projectNameToId[dto.projectName],
@@ -324,8 +349,45 @@ class BackupManager @Inject constructor(
                 createdAtEpochMilli = dto.createdAtEpochMilli,
                 updatedAtEpochMilli = dto.updatedAtEpochMilli,
             )
-            newRecordIds[index] = workRecordRepository.upsert(record).getOrThrow()
+            val existing = existingByKey[recordKey(record)]
+            if (existing != null) {
+                newRecordIds[index] = existing.id
+                if (strategy == RestoreStrategy.MERGE) {
+                    workRecordRepository.upsert(record.copy(id = existing.id)).getOrThrow()
+                }
+                continue
+            }
+            val id = workRecordRepository.upsert(record).getOrThrow()
+            newRecordIds[index] = id
+            recordWasImported[index] = true
+            existingByKey[recordKey(record)] = record.copy(id = id)
+            existingRecords += record.copy(id = id)
             recordsImported += 1
+        }
+
+        // 6. Expenses. ADD_ONLY skips the expenses belonging to an already
+        // existing workday; MERGE replaces that day's expense lines exactly.
+        var expensesImported = 0
+        val expensesByIndex = payload.expenses.groupBy { it.workRecordIndex }
+        for ((recordIndex, dtoExpenses) in expensesByIndex) {
+            val workRecordId = newRecordIds.getOrElse(recordIndex) { 0L }
+            if (workRecordId == 0L) continue
+            if (strategy == RestoreStrategy.ADD_ONLY && !recordWasImported.getOrElse(recordIndex) { false }) continue
+            val expenses = dtoExpenses.map { dto ->
+                Expense(
+                    workRecordId = workRecordId,
+                    amount = dto.amount,
+                    category = runCatching { ExpenseCategory.valueOf(dto.category) }.getOrDefault(ExpenseCategory.OTHER),
+                    description = dto.description,
+                    createdAtEpochMilli = dto.createdAtEpochMilli,
+                )
+            }
+            if (strategy == RestoreStrategy.MERGE) {
+                workRecordRepository.replaceExpenses(workRecordId, expenses).getOrThrow()
+            } else {
+                for (expense in expenses) expenseRepository.add(expense).getOrThrow()
+            }
+            expensesImported += expenses.size
         }
 
         // 8. DataStore preferences. Restored last so a failure in the row
@@ -344,63 +406,25 @@ class BackupManager @Inject constructor(
             }
         }
 
-        // 7. Ledger movements. Independent of work records, so they restore
-        // even when a receipt's project no longer exists.
+        // 7. Ledger movements. Use a stable content key so repeated restores
+        // never duplicate receipts or manual claims.
+        val existingLedger = ledgerRepository.getEntries()
+        fun ledgerKey(entry: ir.metra.app.domain.model.LedgerEntry): String = listOf(
+            entry.kind, entry.amount, entry.reason, entry.entryDateEpochDay,
+            entry.method, entry.projectName, entry.notes,
+        ).joinToString("|")
+        val ledgerByKey = existingLedger.associateBy { ledgerKey(it) }.toMutableMap()
         for (dto in payload.ledgerEntries) {
-            ledgerRepository.upsert(dto.toDomain(now)).getOrThrow()
-        }
-
-        // 6. Expenses, reattached through the index mapping.
-        var expensesImported = 0
-        for (dto in payload.expenses) {
-            val workRecordId = newRecordIds.getOrElse(dto.workRecordIndex) { 0L }
-            if (workRecordId == 0L) continue
-            expenseRepository.add(
-                Expense(
-                    workRecordId = workRecordId,
-                    amount = dto.amount,
-                    category = runCatching { ExpenseCategory.valueOf(dto.category) }
-                        .getOrDefault(ExpenseCategory.OTHER),
-                    description = dto.description,
-                    createdAtEpochMilli = dto.createdAtEpochMilli,
-                ),
-            ).getOrThrow()
-            expensesImported += 1
-        }
-
-        // 7. Profile / settings: only fill in what the user has not set.
-        payload.profile?.let { dto ->
-            val current = userRepository.getProfile()
-            if (current.fullName.isBlank() || strategy == RestoreStrategy.REPLACE) {
-                userRepository.saveProfile(
-                    UserProfile(
-                        fullName = dto.fullName,
-                        companyName = dto.companyName,
-                        employeeCode = dto.employeeCode,
-                        reportFooterNote = dto.reportFooterNote,
-                        onboardingCompleted = dto.onboardingCompleted || current.onboardingCompleted,
-                    ),
-                ).getOrThrow()
+            val incoming = dto.toDomain(now)
+            val existing = ledgerByKey[ledgerKey(incoming)]
+            if (existing != null) {
+                if (strategy == RestoreStrategy.MERGE) {
+                    ledgerRepository.upsert(incoming.copy(id = existing.id)).getOrThrow()
+                }
+                continue
             }
-        }
-        payload.settings?.let { dto ->
-            val current = settingsRepository.getSettings()
-            if (current.defaultSupervisor.isBlank() || strategy == RestoreStrategy.REPLACE) {
-                settingsRepository.saveSettings(
-                    AppSettings(
-                        defaultProjectId = projectNameToId[current.defaultWorkArea] ?: current.defaultProjectId,
-                        defaultSupervisor = dto.defaultSupervisor,
-                        defaultWorkerCount = dto.defaultWorkerCount,
-                        defaultWorkArea = dto.defaultWorkArea,
-                        defaultThresholdMeters = dto.defaultThresholdMeters,
-                        defaultRatePerMeter = dto.defaultRatePerMeter,
-                        currencyCode = dto.currencyCode,
-                        usePreviousWorkdayInfo = dto.usePreviousWorkdayInfo,
-                        reminderEnabled = current.reminderEnabled,
-                        reminderMinuteOfDay = current.reminderMinuteOfDay,
-                    ),
-                ).getOrThrow()
-            }
+            val id = ledgerRepository.upsert(incoming).getOrThrow()
+            ledgerByKey[ledgerKey(incoming)] = incoming.copy(id = id)
         }
 
         backupMetadataDao.upsert(

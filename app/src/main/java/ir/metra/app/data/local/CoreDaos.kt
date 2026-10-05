@@ -56,6 +56,9 @@ interface ProjectDao {
     @Insert
     suspend fun insert(projects: List<ProjectEntity>): List<Long>
 
+    @Query("DELETE FROM projects")
+    suspend fun deleteAll()
+
     @Delete
     suspend fun delete(project: ProjectEntity)
 

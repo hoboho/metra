@@ -18,6 +18,11 @@ import ir.metra.app.domain.usecase.GetPeriodStatistics
 import ir.metra.app.domain.usecase.GetYearlyOverview
 import ir.metra.app.domain.usecase.MonthComparison
 import ir.metra.app.domain.usecase.YearlyOverview
+import ir.metra.app.domain.repository.LedgerRepository
+import ir.metra.app.domain.model.LedgerKind
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import ir.metra.app.ui.components.ChartPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,6 +40,7 @@ data class StatisticsUiState(
     val additionalMetersChart: List<ChartPoint> = emptyList(),
     val expensesChart: List<ChartPoint> = emptyList(),
     val incomeChart: List<ChartPoint> = emptyList(),
+    val receivedChart: List<ChartPoint> = emptyList(),
     val kpis: KpiUi = KpiUi.EMPTY,
     val comparison: ComparisonUi? = null,
     val loading: Boolean = true,
@@ -48,6 +54,9 @@ data class StatisticsUiState(
         val averageAdditionalMeters: String = "",
         val totalExpenses: String = "",
         val averageExpense: String = "",
+        val totalReceivable: String = "",
+        val totalReceived: String = "",
+        val outstanding: String = "",
     ) {
         companion object {
             val EMPTY = KpiUi()
@@ -84,6 +93,7 @@ class StatisticsViewModel @Inject constructor(
     private val compareMonths: CompareMonths,
     private val dateFormatter: DateFormatter,
     private val numberFormatter: NumberFormatter,
+    private val ledgerRepository: LedgerRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(StatisticsUiState())
@@ -110,53 +120,74 @@ class StatisticsViewModel @Inject constructor(
         statsJob?.cancel()
         val current = _state.value
         statsJob = viewModelScope.launch {
-            getPeriodStatistics.observe(current.period, current.customRange).collect { (range, statistics) ->
-                _state.update {
-                    it.copy(
-                        statistics = statistics,
-                        rangeLabel = dateFormatter.formatRange(range.start, range.end),
-                        kpis = buildKpis(statistics),
-                        loading = false,
-                    )
+            getPeriodStatistics.observe(current.period, current.customRange)
+                .flatMapLatest { (range, statistics) ->
+                    ledgerRepository.observeSummaryBetween(range.start, range.end)
+                        .map { summary -> Triple(range, statistics, summary) }
                 }
-                loadCharts(range)
-            }
+                .collect { (range, statistics, summary) ->
+                    _state.update {
+                        it.copy(
+                            statistics = statistics,
+                            rangeLabel = dateFormatter.formatRange(range.start, range.end),
+                            kpis = buildKpis(statistics, summary),
+                            loading = false,
+                        )
+                    }
+                    loadCharts(range)
+                }
         }
     }
 
-    /** Daily series for the selected range, one point per recorded workday. */
+    /** Builds every financial series from work records and the receivables ledger. */
     private suspend fun loadCharts(range: DateRange) {
-        val daily = ArrayList<ChartPoint>()
-        val additional = ArrayList<ChartPoint>()
-        val expenses = ArrayList<ChartPoint>()
-        val income = ArrayList<ChartPoint>()
-
+        val records = ArrayList<ir.metra.app.domain.model.WorkRecord>()
         var offset = 0
         while (true) {
             val page = getPeriodStatistics.readPage(range, offset, PAGE_SIZE)
             if (page.isEmpty()) break
-            for (record in page) {
-                val label = dateFormatter.formatDayMonth(record.workDateEpochDay)
-                daily += ChartPoint(label, record.dailyMeters.toDouble())
-                additional += ChartPoint(label, record.additionalMeters.toDouble())
-                expenses += ChartPoint(label, record.expenseTotal.toDouble())
-                income += ChartPoint(label, record.receivableFromCompany.toDouble())
-            }
+            records += page
             if (page.size < PAGE_SIZE) break
             offset += PAGE_SIZE
         }
-
+        val ledgerEntries = ledgerRepository.getEntries()
+            .filter { it.entryDateEpochDay in range.start..range.end }
+        val workByDay = records.groupBy { it.workDateEpochDay }
+        val ledgerByDay = ledgerEntries.groupBy { it.entryDateEpochDay }
+        val days = (workByDay.keys + ledgerByDay.keys).sorted()
+        val expenses = days.map { day ->
+            ChartPoint(dateFormatter.formatDayMonth(day), workByDay[day].orEmpty().sumOf { it.expenseTotal }.toDouble())
+        }
+        val claims = days.map { day ->
+            val work = workByDay[day].orEmpty().sumOf { it.receivableFromCompany }
+            val manual = ledgerByDay[day].orEmpty().filter { it.kind == LedgerKind.CLAIM }.sumOf { it.amount }
+            ChartPoint(dateFormatter.formatDayMonth(day), (work + manual).toDouble())
+        }
+        val received = days.map { day ->
+            val amount = ledgerByDay[day].orEmpty().filter { it.kind == LedgerKind.RECEIPT }.sumOf { it.amount }
+            ChartPoint(dateFormatter.formatDayMonth(day), amount.toDouble())
+        }
+        val dailyMeters = records.map { record ->
+            ChartPoint(dateFormatter.formatDayMonth(record.workDateEpochDay), record.dailyMeters.toDouble())
+        }
+        val additional = records.map { record ->
+            ChartPoint(dateFormatter.formatDayMonth(record.workDateEpochDay), record.additionalMeters.toDouble())
+        }
         _state.update {
             it.copy(
-                dailyMetersChart = daily,
+                dailyMetersChart = dailyMeters,
                 additionalMetersChart = additional,
                 expensesChart = expenses,
-                incomeChart = income,
+                incomeChart = claims,
+                receivedChart = received,
             )
         }
     }
 
-    private fun buildKpis(statistics: WorkStatistics): StatisticsUiState.KpiUi = StatisticsUiState.KpiUi(
+    private fun buildKpis(
+        statistics: WorkStatistics,
+        summary: ir.metra.app.domain.model.LedgerSummary,
+    ): StatisticsUiState.KpiUi = StatisticsUiState.KpiUi(
         averageMeters = numberFormatter.formatAverage(statistics.averageMetersPerDay),
         maxMeters = numberFormatter.formatMetersValue(statistics.maxMetersInDay),
         minMeters = numberFormatter.formatMetersValue(statistics.minMetersInDay),
@@ -165,6 +196,9 @@ class StatisticsViewModel @Inject constructor(
         averageAdditionalMeters = numberFormatter.formatAverage(statistics.averageAdditionalMetersPerDay),
         totalExpenses = numberFormatter.formatToman(statistics.totals.totalExpenses),
         averageExpense = numberFormatter.formatAverage(statistics.averageExpensePerDay),
+        totalReceivable = numberFormatter.formatToman(summary.totalReceivable),
+        totalReceived = numberFormatter.formatToman(summary.netCollected),
+        outstanding = numberFormatter.formatToman(summary.outstanding),
     )
 
     private fun loadComparison() {

@@ -134,6 +134,14 @@ fun StatisticsScreen(
             }
 
             item {
+                SectionCard(title = stringResource(R.string.statistics_financial_summary)) {
+                    StatRow(stringResource(R.string.statistics_total_receivable), state.kpis.totalReceivable, emphasised = true)
+                    StatRow(stringResource(R.string.statistics_total_received), state.kpis.totalReceived)
+                    StatRow(stringResource(R.string.statistics_outstanding), state.kpis.outstanding, emphasised = true)
+                }
+            }
+
+            item {
                 SectionCard(title = stringResource(R.string.statistics_chart_daily_meters)) {
                     BarChart(points = state.dailyMetersChart)
                 }
@@ -145,12 +153,17 @@ fun StatisticsScreen(
             }
             item {
                 SectionCard(title = stringResource(R.string.statistics_chart_expenses)) {
-                    LineChart(points = state.expensesChart)
+                    BarChart(points = state.expensesChart)
                 }
             }
             item {
-                SectionCard(title = stringResource(R.string.statistics_chart_recorded_income)) {
-                    LineChart(points = state.incomeChart)
+                SectionCard(title = stringResource(R.string.statistics_chart_receivables)) {
+                    BarChart(points = state.incomeChart)
+                }
+            }
+            item {
+                SectionCard(title = stringResource(R.string.statistics_chart_received)) {
+                    BarChart(points = state.receivedChart)
                 }
             }
 

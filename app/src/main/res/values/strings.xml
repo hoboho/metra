@@ -207,6 +207,12 @@
     <string name="statistics_chart_additional_payment">مبلغ متراژ مازاد</string>
     <string name="statistics_chart_expenses">هزینه‌ها</string>
     <string name="statistics_chart_recorded_income">مطالبات</string>
+    <string name="statistics_chart_receivables">مطالبات روزانه</string>
+    <string name="statistics_chart_received">دریافتی روزانه از شرکت</string>
+    <string name="statistics_financial_summary">خلاصهٔ مالی</string>
+    <string name="statistics_total_receivable">کل مطالبات</string>
+    <string name="statistics_total_received">کل دریافتی از شرکت</string>
+    <string name="statistics_outstanding">مانده مطالبات</string>
     <string name="statistics_kpi_average">میانگین کارکرد روزانه</string>
     <string name="statistics_kpi_max">بیشترین کارکرد روز</string>
     <string name="statistics_kpi_min">کمترین کارکرد روز</string>

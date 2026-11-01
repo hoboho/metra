@@ -16,5 +16,7 @@ object ShootingModule {
     @Provides
     @Singleton
     fun provideShootingDatabase(@ApplicationContext context: Context): ShootingDatabase =
-        Room.databaseBuilder(context, ShootingDatabase::class.java, ShootingDatabase.NAME).build()
+        Room.databaseBuilder(context, ShootingDatabase::class.java, ShootingDatabase.NAME)
+            .addMigrations(ShootingDatabase.MIGRATION_1_2)
+            .build()
 }

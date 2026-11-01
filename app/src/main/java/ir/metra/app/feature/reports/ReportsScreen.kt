@@ -110,7 +110,7 @@ fun ReportsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            SectionCard(title = stringResource(R.string.reports_title)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {\n                OutlinedButton(onClick = onOpenCombinedReport, modifier = Modifier.weight(1f)) { Text("گزارش ترکیبی") }\n                OutlinedButton(onClick = onOpenCompanyExpenses, modifier = Modifier.weight(1f)) { Text("هزینه‌های شرکت") }\n            }\n\n            SectionCard(title = stringResource(R.string.reports_title)) {
                 ReportTypeChips(current = state.reportType, onSelected = { viewModel.onReportTypeChange(it) })
             }
 

@@ -212,6 +212,7 @@ fun ShootingScreen(viewModel: ShootingViewModel = hiltViewModel()) {
                         value = stringResource(R.string.unit_meters_suffix, numberFormatter.formatPersian(meters)),
                         emphasised = true,
                     )
+                    }
                 }
             }
 
@@ -252,6 +253,7 @@ fun ShootingScreen(viewModel: ShootingViewModel = hiltViewModel()) {
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.error,
                         )
+                    }
                     }
                 }
             }

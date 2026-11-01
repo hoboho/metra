@@ -13,13 +13,15 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ir.metra.app.core.format.NumberFormatter
-import java.time.LocalDate
+import ir.metra.app.core.format.DateFormatter
+import ir.metra.app.ui.components.JalaliDatePickerDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShootingScreen(viewModel: ShootingViewModel = hiltViewModel()) {
     val s by viewModel.state.collectAsStateWithLifecycle()
     val snack = remember { SnackbarHostState() }
+    var showDatePicker by remember { mutableStateOf(false) }
     LaunchedEffect(s.saved) { if(s.saved) { snack.showSnackbar("گزارش شوتینگ ذخیره شد"); viewModel.consumeSaved() } }
     LaunchedEffect(s.error) { s.error?.let { snack.showSnackbar(it); viewModel.consumeError() } }
     Scaffold(snackbarHost={ SnackbarHost(snack) }, topBar={ TopAppBar(title={ Text("شوتینگ فیبر نوری") }) }) { pad ->
@@ -32,7 +34,7 @@ fun ShootingScreen(viewModel: ShootingViewModel = hiltViewModel()) {
                             OutlinedTextField(s.projectName,{},readOnly=true,label={Text("پروژه")},trailingIcon={ExposedDropdownMenuDefaults.TrailingIcon(projectMenu)},modifier=Modifier.menuAnchor().fillMaxWidth())
                             ExposedDropdownMenu(projectMenu,{projectMenu=false}) { s.projects.forEach { p -> DropdownMenuItem(text={Text(p.name)},onClick={viewModel.selectProject(p.id);projectMenu=false}) } }
                         }
-                        Field("تاریخ (YYYY-MM-DD)", LocalDate.ofEpochDay(s.date).toString(), false) { v -> runCatching { LocalDate.parse(v).toEpochDay() }.onSuccess(viewModel::updateDate) }
+                        OutlinedButton(onClick={showDatePicker=true}, modifier=Modifier.fillMaxWidth()) { Text("تاریخ: " + DateFormatter().formatLong(s.date)) }
                         Field("محدوده کار",s.workArea) { viewModel.header("area",it) }
                         Field("کارفرما",s.employer) { viewModel.header("employer",it) }
                         Field("ناظر",s.supervisor) { viewModel.header("supervisor",it) }
@@ -91,6 +93,7 @@ fun ShootingScreen(viewModel: ShootingViewModel = hiltViewModel()) {
             }
         }
     }
+    if (showDatePicker) JalaliDatePickerDialog(initialEpochDay=s.date,onDismiss={showDatePicker=false},onDateSelected={viewModel.updateDate(it)})
 }
 @Composable
 private fun Field(label:String,value:String,numeric:Boolean=false,onChange:(String)->Unit) {

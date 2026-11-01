@@ -265,6 +265,8 @@ class BackupManager @Inject constructor(
             }
         }
 
+        if (strategy == RestoreStrategy.REPLACE) shootingRepository.clearCompanyExpenses()
+
         // 3. Projects. Prefer the stable uuid (survives renames); fall back to
         // name for v1 backups that predate the uuid column.
         val existingProjects = projectRepository.getProjects()
@@ -444,6 +446,38 @@ class BackupManager @Inject constructor(
             }
             val id = ledgerRepository.upsert(incoming).getOrThrow()
             ledgerByKey[ledgerKey(incoming)] = incoming.copy(id = id)
+        }
+
+        // 8. Company expenses and their partial settlements live in shooting.db.
+        val existingCompanyExpenses = shootingRepository.allCompanyExpenses()
+        fun companyExpenseKey(e: CompanyExpenseEntity) = listOf(e.projectName, e.expenseDateEpochDay, e.activity, e.category, e.amount, e.description, e.receiptReference).joinToString("|")
+        val companyExpenseByKey = existingCompanyExpenses.associateBy(::companyExpenseKey).toMutableMap()
+        val importedExpenseIds = LongArray(payload.companyExpenses.size)
+        for ((index, dto) in payload.companyExpenses.withIndex()) {
+            val incoming = CompanyExpenseEntity(
+                projectId = projectNameToId[dto.projectName], projectName = dto.projectName,
+                expenseDateEpochDay = dto.dateEpochDay, activity = dto.activity, category = dto.category,
+                amount = dto.amount, description = dto.description, receiptReference = dto.receiptReference,
+                createdAtEpochMilli = dto.createdAtEpochMilli,
+            )
+            val existing = companyExpenseByKey[companyExpenseKey(incoming)]
+            val id = existing?.id ?: shootingRepository.importCompanyExpense(incoming)
+            importedExpenseIds[index] = id
+            if (existing == null) companyExpenseByKey[companyExpenseKey(incoming)] = incoming.copy(id = id)
+        }
+        val knownSettlements = shootingRepository.allExpenseSettlements().map {
+            listOf(it.expenseId, it.settlementDateEpochDay, it.amount, it.notes).joinToString("|")
+        }.toMutableSet()
+        for (dto in payload.expenseSettlements) {
+            val expenseId = importedExpenseIds.getOrElse(dto.expenseIndex) { 0L }
+            if (expenseId == 0L) continue
+            val key = listOf(expenseId, dto.dateEpochDay, dto.amount, dto.notes).joinToString("|")
+            if (knownSettlements.add(key)) {
+                shootingRepository.importSettlement(ExpenseSettlementEntity(
+                    expenseId = expenseId, settlementDateEpochDay = dto.dateEpochDay,
+                    amount = dto.amount, notes = dto.notes, createdAtEpochMilli = dto.createdAtEpochMilli,
+                ))
+            }
         }
 
         backupMetadataDao.upsert(

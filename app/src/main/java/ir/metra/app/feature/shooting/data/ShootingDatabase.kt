@@ -2,6 +2,8 @@ package ir.metra.app.feature.shooting.data
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Entity(tableName = "shooting_reports", indices = [Index("project_id"), Index("work_date_epoch_day")])
 data class ShootingReportEntity(
@@ -67,10 +69,41 @@ interface ShootingDao {
     suspend fun reportsInRange(start: Long, end: Long): List<ShootingReportEntity>
     @Query("SELECT COALESCE(SUM(total_meters), 0) FROM shooting_reports WHERE work_date_epoch_day BETWEEN :start AND :end")
     suspend fun totalMeters(start: Long, end: Long): Long
+    @Query("SELECT * FROM company_expenses WHERE expense_date_epoch_day BETWEEN :start AND :end ORDER BY expense_date_epoch_day DESC, id DESC")
+    suspend fun expensesInRange(start: Long, end: Long): List<CompanyExpenseEntity>
+    @Query("SELECT * FROM company_expenses ORDER BY expense_date_epoch_day DESC, id DESC")
+    suspend fun allExpenses(): List<CompanyExpenseEntity>
+    @Query("SELECT * FROM expense_settlements WHERE expense_id = :expenseId ORDER BY settlement_date_epoch_day, id")
+    suspend fun settlements(expenseId: Long): List<ExpenseSettlementEntity>
+    @Query("SELECT COALESCE(SUM(amount), 0) FROM expense_settlements WHERE expense_id = :expenseId")
+    suspend fun settledAmount(expenseId: Long): Long
+    @Insert
+    suspend fun insertCompanyExpense(expense: CompanyExpenseEntity): Long
+    @Insert
+    suspend fun insertSettlement(settlement: ExpenseSettlementEntity): Long
+    @Query("DELETE FROM company_expenses WHERE id = :id")
+    suspend fun deleteCompanyExpense(id: Long)
+    @Query("DELETE FROM expense_settlements")
+    suspend fun deleteAllSettlements()
+    @Query("DELETE FROM company_expenses")
+    suspend fun deleteAllCompanyExpenses()
 }
 
-@Database(entities = [ShootingReportEntity::class, ShootingOperationEntity::class, CableTypeEntity::class], version = 1, exportSchema = true)
+@Database(entities = [ShootingReportEntity::class, ShootingOperationEntity::class, CableTypeEntity::class, CompanyExpenseEntity::class, ExpenseSettlementEntity::class], version = 2, exportSchema = true)
 abstract class ShootingDatabase : RoomDatabase() {
     abstract fun shootingDao(): ShootingDao
-    companion object { const val NAME = "shooting.db" }
+    companion object {
+        const val NAME = "shooting.db"
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS company_expenses (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, project_id INTEGER, project_name TEXT NOT NULL, expense_date_epoch_day INTEGER NOT NULL, activity TEXT NOT NULL, category TEXT NOT NULL, amount INTEGER NOT NULL, description TEXT NOT NULL, receipt_reference TEXT NOT NULL, created_at_epoch_milli INTEGER NOT NULL)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_company_expenses_project_id ON company_expenses(project_id)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_company_expenses_expense_date_epoch_day ON company_expenses(expense_date_epoch_day)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_company_expenses_activity ON company_expenses(activity)")
+                db.execSQL("CREATE TABLE IF NOT EXISTS expense_settlements (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, expense_id INTEGER NOT NULL, settlement_date_epoch_day INTEGER NOT NULL, amount INTEGER NOT NULL, notes TEXT NOT NULL, created_at_epoch_milli INTEGER NOT NULL, FOREIGN KEY(expense_id) REFERENCES company_expenses(id) ON UPDATE NO ACTION ON DELETE CASCADE)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_expense_settlements_expense_id ON expense_settlements(expense_id)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_expense_settlements_settlement_date_epoch_day ON expense_settlements(settlement_date_epoch_day)")
+            }
+        }
+    }
 }

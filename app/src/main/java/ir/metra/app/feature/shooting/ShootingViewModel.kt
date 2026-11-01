@@ -47,6 +47,7 @@ class ShootingViewModel @Inject constructor(
         val p = projectsRepository.getProject(id) ?: return@launch
         _state.update { it.copy(projectId = id, projectName = p.name, workArea = p.workArea, employer = p.employer, supervisor = p.defaultSupervisor) }
     } }
+    fun updateDate(epochDay: Long) = _state.update { it.copy(date = epochDay) }
     fun header(key: String, value: String) = _state.update {
         when(key) {
             "area" -> it.copy(workArea=value); "employer" -> it.copy(employer=value)

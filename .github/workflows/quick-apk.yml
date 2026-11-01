@@ -1,6 +1,8 @@
 name: Debug APK
 
 on:
+  push:
+    branches: [arena/d9952aed-metra]
   workflow_dispatch:
 
 permissions:

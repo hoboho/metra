@@ -38,7 +38,8 @@ data class BackupPayload(
     // DataStore preferences live outside Room, so without this block a restore
     // silently resets the theme, the reminder and the prefill toggle.
     val preferences: PreferencesDto? = null,
-    val companyExpenses: List<CompanyExpenseDto> = emptyList(),\n    val expenseSettlements: List<ExpenseSettlementDto> = emptyList(),
+    val companyExpenses: List<CompanyExpenseDto> = emptyList(),
+    val expenseSettlements: List<ExpenseSettlementDto> = emptyList(),
     val shootingReports: List<ShootingReportDto> = emptyList(),
 ) {
     fun counts(): BackupCounts = BackupCounts(

@@ -44,6 +44,7 @@ import ir.metra.app.feature.settings.PaymentRulesScreen
 import ir.metra.app.feature.settings.SettingsScreen
 import ir.metra.app.feature.statistics.StatisticsScreen
 import ir.metra.app.feature.statistics.YearlyOverviewScreen
+import ir.metra.app.feature.shooting.ShootingScreen
 import ir.metra.app.feature.work.WorkEditorScreen
 import ir.metra.app.feature.work.WorkLogScreen
 import kotlinx.serialization.Serializable
@@ -69,6 +70,9 @@ data class LedgerEditorArgs(val entryId: Long = 0L)
 
 @Serializable
 data object StatisticsRoute
+
+@Serializable
+data object ShootingRoute
 
 @Serializable
 data object SettingsRoute
@@ -113,6 +117,7 @@ enum class TopLevelDestination(
     Ledger(LedgerRoute, R.string.nav_ledger, Icons.Filled.Receipt, R.string.nav_ledger),
     Statistics(StatisticsRoute, R.string.nav_statistics, Icons.Filled.BarChart, R.string.nav_statistics),
     Settings(SettingsRoute, R.string.nav_settings, Icons.Filled.Settings, R.string.nav_settings),
+    Shooting(ShootingRoute, R.string.nav_shooting, Icons.Filled.ListAlt, R.string.nav_shooting),
 }
 
 @Composable
@@ -157,6 +162,7 @@ fun MetraNavHost(
                 onOpenYearlyOverview = { navController.navigate(YearlyOverviewRoute) },
             )
         }
+        composable<ShootingRoute> { ShootingScreen() }
         composable<SettingsRoute> {
             SettingsScreen(
                 onOpenProjects = { navController.navigate(ProjectsRoute) },

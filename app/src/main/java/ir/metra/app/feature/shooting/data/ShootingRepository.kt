@@ -63,4 +63,31 @@ class ShootingRepository @Inject constructor(
     suspend fun operations(id: Long) = dao.getOperations(id)
     suspend fun reports(start: Long, end: Long) = dao.reportsInRange(start, end)
     suspend fun total(start: Long, end: Long) = dao.totalMeters(start, end)
+
+    suspend fun addCompanyExpense(expense: CompanyExpenseEntity): Long {
+        require(expense.amount > 0L)
+        return dao.insertCompanyExpense(expense)
+    }
+    suspend fun addSettlement(expenseId: Long, date: Long, amount: Long, notes: String = ""): Long {
+        require(amount > 0L)
+        return database.withTransaction {
+            val expense = dao.allExpenses().firstOrNull { it.id == expenseId } ?: error("Expense not found")
+            val settled = dao.settledAmount(expenseId)
+            require(settled + amount <= expense.amount) { "Settlement exceeds outstanding expense" }
+            dao.insertSettlement(ExpenseSettlementEntity(expenseId = expenseId, settlementDateEpochDay = date, amount = amount, notes = notes, createdAtEpochMilli = System.currentTimeMillis()))
+        }
+    }
+    suspend fun companyExpenses(start: Long, end: Long) = dao.expensesInRange(start, end).map { expense ->
+        expense to dao.settledAmount(expense.id)
+    }
+    suspend fun allCompanyExpenses() = dao.allExpenses()
+    suspend fun allExpenseSettlements() = dao.allSettlements()
+    suspend fun clearCompanyExpenses() = database.withTransaction {
+        dao.deleteAllSettlements()
+        dao.deleteAllCompanyExpenses()
+    }
+    suspend fun importCompanyExpense(expense: CompanyExpenseEntity) = dao.insertCompanyExpense(expense)
+    suspend fun importSettlement(settlement: ExpenseSettlementEntity) = dao.insertSettlement(settlement)
+    suspend fun combinedReports(start: Long, end: Long, projectId: Long?) = dao.reportsInRangeForProject(start, end, projectId)
+
 }

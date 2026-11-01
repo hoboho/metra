@@ -82,6 +82,7 @@ class ShootingRepository @Inject constructor(
     }
     suspend fun allCompanyExpenses() = dao.allExpenses()
     suspend fun allExpenseSettlements() = dao.allSettlements()
+    suspend fun deleteCompanyExpense(id: Long) = dao.deleteCompanyExpense(id)
     suspend fun clearCompanyExpenses() = database.withTransaction {
         dao.deleteAllSettlements()
         dao.deleteAllCompanyExpenses()

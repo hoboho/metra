@@ -131,6 +131,17 @@ class BackupManager @Inject constructor(
             }
         }
 
+        val companyExpenseRows = shootingRepository.allCompanyExpenses()
+        val companyExpenseIndex = companyExpenseRows.mapIndexed { index, expense -> expense.id to index }.toMap()
+        val companyExpenseDtos = companyExpenseRows.map { expense ->
+            CompanyExpenseDto(expense.projectName, expense.expenseDateEpochDay, expense.activity, expense.category, expense.amount, expense.description, expense.receiptReference, expense.createdAtEpochMilli)
+        }
+        val settlementDtos = shootingRepository.allExpenseSettlements().mapNotNull { settlement ->
+            companyExpenseIndex[settlement.expenseId]?.let { index ->
+                ExpenseSettlementDto(index, settlement.settlementDateEpochDay, settlement.amount, settlement.notes, settlement.createdAtEpochMilli)
+            }
+        }
+
         val payload = BackupPayload(
             formatVersion = BackupPayload.CURRENT_FORMAT_VERSION,
             appVersionName = appInfo.info().versionName,
@@ -142,6 +153,8 @@ class BackupManager @Inject constructor(
             projects = projects.map { it.toDto() },
             workRecords = records.map { it.toDto() },
             expenses = expenses,
+            companyExpenses = companyExpenseDtos,
+            expenseSettlements = settlementDtos,
             reportConfigurations = emptyList(),
             ledgerEntries = ledgerRepository.getEntries().map { it.toDto() },
             preferences = preferencesRepository.preferences.first().let { prefs ->
@@ -514,6 +527,16 @@ class BackupManager @Inject constructor(
                 expenses += expense.toDto(workRecordIndex = index)
             }
         }
+        val companyExpenseRows = shootingRepository.allCompanyExpenses()
+        val companyExpenseIndex = companyExpenseRows.mapIndexed { index, expense -> expense.id to index }.toMap()
+        val companyExpenseDtos = companyExpenseRows.map { expense ->
+            CompanyExpenseDto(expense.projectName, expense.expenseDateEpochDay, expense.activity, expense.category, expense.amount, expense.description, expense.receiptReference, expense.createdAtEpochMilli)
+        }
+        val settlementDtos = shootingRepository.allExpenseSettlements().mapNotNull { settlement ->
+            companyExpenseIndex[settlement.expenseId]?.let { index ->
+                ExpenseSettlementDto(index, settlement.settlementDateEpochDay, settlement.amount, settlement.notes, settlement.createdAtEpochMilli)
+            }
+        }
         success(
             BackupPayload(
                 formatVersion = BackupPayload.CURRENT_FORMAT_VERSION,
@@ -526,6 +549,8 @@ class BackupManager @Inject constructor(
                 projects = projects.map { it.toDto() },
                 workRecords = records.map { it.toDto() },
                 expenses = expenses,
+                companyExpenses = companyExpenseDtos,
+                expenseSettlements = settlementDtos,
             ),
         )
     }.fold({ it }, { failure(MetraError.Unknown(it.message ?: "collect")) })

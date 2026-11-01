@@ -103,6 +103,6 @@ class CompanyExpenseViewModel @Inject constructor(
                 .onFailure { e -> _state.update { it.copy(error=e.message ?: "خطا در ثبت تسویه") } }
         }
     }
-    fun delete(id: Long) { viewModelScope.launch { shooting.clearCompanyExpenses(); refresh() } }
+    fun delete(id: Long) { viewModelScope.launch { shooting.deleteCompanyExpense(id); refresh() } }
     fun consumeError() = _state.update { it.copy(error=null) }
 }

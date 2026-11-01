@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ir.metra.app.core.format.NumberFormatter
+import ir.metra.app.core.date.JalaliCalendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,7 +55,7 @@ fun CompanyExpensesScreen(viewModel: CompanyExpenseViewModel = hiltViewModel()) 
                     Text("مانده: " + NumberFormatter().formatToman(outstanding), color = MaterialTheme.colorScheme.primary)
                     if (outstanding > 0) {
                         OutlinedTextField(value = s.settlementAmounts[expense.id].orEmpty(), onValueChange = { v -> viewModel.update { it.copy(settlementAmounts = it.settlementAmounts + (expense.id to v.filter(Char::isDigit))) } }, label = { Text("مبلغ تسویه جدید") }, modifier = Modifier.fillMaxWidth())
-                        OutlinedButton(onClick = { viewModel.settle(expense.id, expense.expenseDateEpochDay) }, modifier = Modifier.fillMaxWidth()) { Text("ثبت تسویه جزئی / کامل") }
+                        OutlinedButton(onClick = { viewModel.settle(expense.id, JalaliCalendar.today().toEpochDay()) }, modifier = Modifier.fillMaxWidth()) { Text("ثبت تسویه جزئی / کامل") }
                     }
                     TextButton(onClick = { viewModel.delete(expense.id) }) { Icon(Icons.Default.Delete, null); Text("حذف هزینه") }
                 }

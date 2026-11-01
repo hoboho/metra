@@ -292,7 +292,10 @@ class BackupManager @Inject constructor(
             }
         }
 
-        if (strategy == RestoreStrategy.REPLACE) shootingRepository.clearCompanyExpenses()
+        if (strategy == RestoreStrategy.REPLACE) {
+            shootingRepository.clearCompanyExpenses()
+            shootingRepository.clearShootingReports()
+        }
 
         // 3. Projects. Prefer the stable uuid (survives renames); fall back to
         // name for v1 backups that predate the uuid column.
@@ -473,6 +476,37 @@ class BackupManager @Inject constructor(
             }
             val id = ledgerRepository.upsert(incoming).getOrThrow()
             ledgerByKey[ledgerKey(incoming)] = incoming.copy(id = id)
+        }
+
+        // Restore fiber-shooting reports without coupling them to trench records.
+        shootingRepository.seedCableTypes()
+        val cableIdsByCore = shootingRepository.allCableTypes().associate { it.coreCount to it.id }
+        val existingShootingKeys = shootingRepository.allShootingReports().map {
+            listOf(it.projectName, it.workDateEpochDay, it.workArea, it.totalMeters).joinToString("|")
+        }.toMutableSet()
+        for (dto in payload.shootingReports) {
+            val total = dto.operations.sumOf { kotlin.math.abs(it.endMeter - it.startMeter) }
+            val key = listOf(dto.projectName, dto.dateEpochDay, dto.workArea, total).joinToString("|")
+            if (!existingShootingKeys.add(key)) continue
+            val report = ShootingReportEntity(
+                projectId = projectNameToId[dto.projectName], projectName = dto.projectName,
+                workDateEpochDay = dto.dateEpochDay, workArea = dto.workArea, employer = dto.employer,
+                supervisor = dto.supervisor, workerCount = dto.workerCount, notes = dto.notes,
+                totalMeters = total, createdAtEpochMilli = dto.createdAtEpochMilli,
+                updatedAtEpochMilli = dto.updatedAtEpochMilli,
+            )
+            val operations = dto.operations.map { operation ->
+                val cableId = cableIdsByCore[operation.cableCoreCount]
+                    ?: error("Unknown cable core count in backup: ${operation.cableCoreCount}")
+                ShootingOperationEntity(
+                    reportId = 0L, startPointType = operation.startPointType,
+                    startPointCode = operation.startPointCode, startMeter = operation.startMeter,
+                    endPointType = operation.endPointType, endPointCode = operation.endPointCode,
+                    endMeter = operation.endMeter, cableTypeId = cableId,
+                    operationMeters = kotlin.math.abs(operation.endMeter - operation.startMeter),
+                )
+            }
+            shootingRepository.importShootingReport(report, operations)
         }
 
         // 8. Company expenses and their partial settlements live in shooting.db.

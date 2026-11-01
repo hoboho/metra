@@ -3,12 +3,11 @@ package ir.metra.app.ui.navigation
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.ListAlt
 import androidx.compose.material.icons.filled.Receipt
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -75,6 +74,9 @@ data object StatisticsRoute
 data object ShootingRoute
 
 @Serializable
+data object MoreRoute
+
+@Serializable
 data object SettingsRoute
 
 @Serializable
@@ -115,9 +117,7 @@ enum class TopLevelDestination(
     WorkLog(WorkLogRoute, R.string.nav_worklog, Icons.Filled.ListAlt, R.string.nav_worklog),
     Reports(ReportsRoute, R.string.nav_reports, Icons.Filled.InsertDriveFile, R.string.nav_reports),
     Ledger(LedgerRoute, R.string.nav_ledger, Icons.Filled.Receipt, R.string.nav_ledger),
-    Statistics(StatisticsRoute, R.string.nav_statistics, Icons.Filled.BarChart, R.string.nav_statistics),
-    Settings(SettingsRoute, R.string.nav_settings, Icons.Filled.Settings, R.string.nav_settings),
-    Shooting(ShootingRoute, R.string.nav_shooting, Icons.Filled.ListAlt, R.string.nav_shooting),
+    More(MoreRoute, R.string.nav_more, Icons.Filled.MoreHoriz, R.string.nav_more),
 }
 
 @Composable
@@ -136,7 +136,7 @@ fun MetraNavHost(
                 onOpenWorkEditor = { navController.navigate(WorkEditorArgs(todayShortcut = true)) },
                 onOpenWorkLog = { onNavigateToTopLevel(TopLevelDestination.WorkLog) },
                 onOpenReports = { onNavigateToTopLevel(TopLevelDestination.Reports) },
-                onOpenStatistics = { onNavigateToTopLevel(TopLevelDestination.Statistics) },
+                onOpenStatistics = { navController.navigate(StatisticsRoute) },
             )
         }
         composable<WorkLogRoute> {
@@ -163,6 +163,13 @@ fun MetraNavHost(
             )
         }
         composable<ShootingRoute> { ShootingScreen() }
+        composable<MoreRoute> {
+            MoreScreen(
+                onOpenStatistics = { navController.navigate(StatisticsRoute) },
+                onOpenShooting = { navController.navigate(ShootingRoute) },
+                onOpenSettings = { navController.navigate(SettingsRoute) },
+            )
+        }
         composable<SettingsRoute> {
             SettingsScreen(
                 onOpenProjects = { navController.navigate(ProjectsRoute) },
@@ -206,6 +213,10 @@ fun MetraApp(
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
+    val isMoreSection = currentDestination?.let { destination ->
+        listOf(MoreRoute::class, StatisticsRoute::class, ShootingRoute::class, SettingsRoute::class)
+            .any { route -> destination.hasRoute(route) }
+    } ?: false
 
     // The FAB is only useful on the screens that list or summarise work.
     val showFab = currentDestination?.let { destination ->
@@ -220,9 +231,9 @@ fun MetraApp(
     Scaffold(
         containerColor = androidx.compose.material3.MaterialTheme.colorScheme.background,
         bottomBar = {
-            if (currentDestination != null && TopLevelDestination.entries.any { top ->
+            if (currentDestination != null && (isMoreSection || TopLevelDestination.entries.any { top ->
                     currentDestination.hasRoute(top.route::class)
-                }
+                })
             ) {
                 NavigationBar(
                     containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surface,
@@ -230,7 +241,9 @@ fun MetraApp(
                     windowInsets = NavigationBarDefaults.windowInsets,
                 ) {
                     TopLevelDestination.entries.forEach { destination ->
-                        val selected = currentDestination.hasRoute(destination.route::class)
+                        val selected = if (destination == TopLevelDestination.More) {
+                            isMoreSection
+                        } else currentDestination.hasRoute(destination.route::class)
                         NavigationBarItem(
                             selected = selected,
                             onClick = {

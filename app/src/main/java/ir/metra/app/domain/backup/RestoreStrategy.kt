@@ -35,10 +35,13 @@ data class RestorePreview(
     val existingProjects: Int,
     val existingWorkRecords: Int,
     val existingExpenses: Int,
+    val incomingShootingReports: Int = 0,
+    val existingShootingReports: Int = 0,
     val encrypted: Boolean,
     val formatSupported: Boolean,
 ) {
-    val willOverwriteExistingData: Boolean get() = existingWorkRecords > 0 || existingProjects > 0
+    val willOverwriteExistingData: Boolean get() =
+        existingWorkRecords > 0 || existingProjects > 0 || existingShootingReports > 0
 }
 
 /** Outcome of a restore. */
@@ -48,5 +51,6 @@ data class RestoreOutcome(
     val workRecordsImported: Int,
     val expensesImported: Int,
     val paymentRulesImported: Int,
+    val shootingReportsImported: Int = 0,
     val safetySnapshotFile: String?,
 )

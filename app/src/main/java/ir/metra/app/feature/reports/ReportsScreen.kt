@@ -196,6 +196,10 @@ fun ReportsScreen(
                 )
                 StatRow(stringResource(R.string.dashboard_total_expenses), state.totalsUi.expenses)
                 StatRow(
+                    stringResource(R.string.shooting_total_meters),
+                    stringResource(R.string.unit_meters_suffix, state.totalsUi.shootingMeters),
+                )
+                StatRow(
                     stringResource(R.string.report_total_receivable),
                     state.totalsUi.recordedIncome,
                     emphasised = true,

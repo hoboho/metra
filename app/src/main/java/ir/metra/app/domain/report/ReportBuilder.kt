@@ -19,6 +19,7 @@ import ir.metra.app.domain.model.LedgerKind
 import ir.metra.app.domain.repository.UserRepository
 import ir.metra.app.domain.repository.WorkRecordRepository
 import ir.metra.app.domain.repository.WorkStatisticsRepository
+import ir.metra.app.domain.repository.ShootingSummaryRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -38,6 +39,7 @@ class ReportBuilder @Inject constructor(
     private val dateFormatter: DateFormatter,
     private val numberFormatter: NumberFormatter,
     private val clock: Clock,
+    private val shootingSummaryRepository: ShootingSummaryRepository,
 ) {
 
     /** Rows pulled per page when assembling the detailed table. */
@@ -75,6 +77,11 @@ class ReportBuilder @Inject constructor(
         }
 
         val projectName = request.projectId?.let { projectRepository.getProject(it)?.name }
+        val shootingTotalMeters = shootingSummaryRepository.totalMeters(
+            startEpochDay = request.startEpochDay,
+            endEpochDay = request.endEpochDay,
+            projectId = request.projectId,
+        )
 
         ReportData(
             type = request.type,
@@ -85,6 +92,7 @@ class ReportBuilder @Inject constructor(
             profile = profile,
             totals = totals,
             ledger = ledger,
+            shootingTotalMeters = shootingTotalMeters,
             records = records,
             projectBreakdown = projectBreakdown,
             expensesByCategory = expensesByCategory,

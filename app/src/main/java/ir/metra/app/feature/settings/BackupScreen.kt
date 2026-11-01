@@ -285,8 +285,10 @@ private fun RestorePreviewDialog(
                         ir.metra.app.core.format.PersianDigits.toPersian(preview.incomingProjects.toString()),
                         ir.metra.app.core.format.PersianDigits.toPersian(preview.incomingWorkRecords.toString()),
                         ir.metra.app.core.format.PersianDigits.toPersian(preview.incomingExpenses.toString()),
+                        ir.metra.app.core.format.PersianDigits.toPersian(preview.incomingShootingReports.toString()),
                         ir.metra.app.core.format.PersianDigits.toPersian(preview.existingProjects.toString()),
                         ir.metra.app.core.format.PersianDigits.toPersian(preview.existingWorkRecords.toString()),
+                        ir.metra.app.core.format.PersianDigits.toPersian(preview.existingShootingReports.toString()),
                     ),
                     style = MaterialTheme.typography.bodyMedium,
                 )

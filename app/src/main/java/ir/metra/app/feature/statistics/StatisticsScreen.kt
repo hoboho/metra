@@ -121,6 +121,10 @@ fun StatisticsScreen(
                         stringResource(R.string.unit_meters_suffix, state.kpis.totalMeters),
                     )
                     StatRow(
+                        stringResource(R.string.shooting_total_meters),
+                        stringResource(R.string.unit_meters_suffix, state.kpis.shootingMeters),
+                    )
+                    StatRow(
                         stringResource(R.string.statistics_kpi_total_additional),
                         stringResource(R.string.unit_meters_suffix, state.kpis.totalAdditionalMeters),
                     )

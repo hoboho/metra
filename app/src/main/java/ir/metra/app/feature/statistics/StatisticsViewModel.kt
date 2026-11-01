@@ -20,6 +20,7 @@ import ir.metra.app.domain.usecase.MonthComparison
 import ir.metra.app.domain.usecase.YearlyOverview
 import ir.metra.app.domain.repository.LedgerRepository
 import ir.metra.app.domain.model.LedgerKind
+import ir.metra.app.domain.repository.ShootingSummaryRepository
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -57,6 +58,7 @@ data class StatisticsUiState(
         val totalReceivable: String = "",
         val totalReceived: String = "",
         val outstanding: String = "",
+        val shootingMeters: String = "",
     ) {
         companion object {
             val EMPTY = KpiUi()
@@ -94,6 +96,7 @@ class StatisticsViewModel @Inject constructor(
     private val dateFormatter: DateFormatter,
     private val numberFormatter: NumberFormatter,
     private val ledgerRepository: LedgerRepository,
+    private val shootingRepository: ShootingSummaryRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(StatisticsUiState())
@@ -122,15 +125,24 @@ class StatisticsViewModel @Inject constructor(
         statsJob = viewModelScope.launch {
             getPeriodStatistics.observe(current.period, current.customRange)
                 .flatMapLatest { (range, statistics) ->
-                    ledgerRepository.observeSummaryBetween(range.start, range.end)
-                        .map { summary -> Triple(range, statistics, summary) }
+                    combine(
+                        ledgerRepository.observeSummaryBetween(range.start, range.end),
+                        shootingRepository.observeDailyTotals(),
+                    ) { summary, shootingReports ->
+                        val shootingMeters = shootingReports
+                            .asSequence()
+                            .filter { it.workDateEpochDay in range.start..range.end }
+                            .sumOf { it.totalMeters }
+                        Pair(Triple(range, statistics, summary), shootingMeters)
+                    }
                 }
-                .collect { (range, statistics, summary) ->
+                .collect { (snapshot, shootingMeters) ->
+                    val (range, statistics, summary) = snapshot
                     _state.update {
                         it.copy(
                             statistics = statistics,
                             rangeLabel = dateFormatter.formatRange(range.start, range.end),
-                            kpis = buildKpis(statistics, summary),
+                            kpis = buildKpis(statistics, summary, shootingMeters),
                             loading = false,
                         )
                     }
@@ -187,6 +199,7 @@ class StatisticsViewModel @Inject constructor(
     private fun buildKpis(
         statistics: WorkStatistics,
         summary: ir.metra.app.domain.model.LedgerSummary,
+        shootingMeters: Long,
     ): StatisticsUiState.KpiUi = StatisticsUiState.KpiUi(
         averageMeters = numberFormatter.formatAverage(statistics.averageMetersPerDay),
         maxMeters = numberFormatter.formatMetersValue(statistics.maxMetersInDay),
@@ -199,6 +212,7 @@ class StatisticsViewModel @Inject constructor(
         totalReceivable = numberFormatter.formatToman(summary.totalReceivable),
         totalReceived = numberFormatter.formatToman(summary.netCollected),
         outstanding = numberFormatter.formatToman(summary.outstanding),
+        shootingMeters = numberFormatter.formatPersian(shootingMeters),
     )
 
     private fun loadComparison() {

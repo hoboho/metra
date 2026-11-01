@@ -54,6 +54,7 @@ class PdfReportComposer @Inject constructor(
         val summaryEntries = linkedMapOf(
             "تعداد روزهای کاری" to numberFormatter.formatPersian(totals.workdays.toLong()),
             "مجموع کارکرد" to numberFormatter.formatMetersValue(totals.totalMeters) + " متر",
+            "مجموع شوتینگ فیبر" to numberFormatter.formatMetersValue(data.shootingTotalMeters) + " متر",
             "میانگین کارکرد روزانه" to numberFormatter.formatAverage(totals.averageMetersPerDay) + " متر",
             "مجموع متراژ مازاد" to numberFormatter.formatMetersValue(totals.totalAdditionalMeters) + " متر",
             "مبلغ متراژ مازاد (محاسبهٔ مترا)" to numberFormatter.formatToman(totals.totalAdditionalPayment),

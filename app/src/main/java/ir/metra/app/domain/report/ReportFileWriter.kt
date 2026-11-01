@@ -75,6 +75,7 @@ class ReportFileWriter @Inject constructor(
                         data.ledger.totalReceivable.toString(),
                         data.ledger.totalReceived.toString(),
                         data.ledger.outstanding.toString(),
+                        data.shootingTotalMeters.toString(),
                         record.notes,
                     ).let { CsvEscaping.row(it, CSV_SEPARATOR) },
                 )
@@ -120,7 +121,8 @@ class ReportFileWriter @Inject constructor(
                 ws.value(row, 11, data.ledger.totalReceivable)
                 ws.value(row, 12, data.ledger.totalReceived)
                 ws.value(row, 13, data.ledger.outstanding)
-                ws.value(row, 14, record.notes)
+                ws.value(row, 14, data.shootingTotalMeters)
+                ws.value(row, 15, record.notes)
             }
 
             EXCEL_HEADER.indices.forEach { ws.width(it, EXCEL_COLUMN_WIDTH) }
@@ -161,7 +163,8 @@ class ReportFileWriter @Inject constructor(
         val EXCEL_HEADER = listOf(
             "تاریخ", "پروژه", "محدوده", "کارفرما", "ناظر", "تعداد کارگر",
             "کارکرد", "متراژ اضافه", "نرخ", "مبلغ متراژ اضافه",
-            "هزینه قابل مطالبه", "کل مطالبات", "دریافتی از شرکت", "مانده مطالبات", "توضیحات",
+            "هزینه قابل مطالبه", "کل مطالبات", "دریافتی از شرکت", "مانده مطالبات",
+            "جمع شوتینگ فیبر (متر)", "توضیحات",
         )
 
         /** Persian column headers, as required for Excel-friendly output. */
@@ -180,6 +183,7 @@ class ReportFileWriter @Inject constructor(
             "کل مطالبات",
             "دریافتی از شرکت",
             "مانده مطالبات",
+            "جمع شوتینگ فیبر (متر)",
             "توضیحات",
         )
 

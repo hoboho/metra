@@ -27,6 +27,7 @@ data class ReportData(
     val profile: UserProfile,
     val totals: WorkTotals,
     val ledger: ReportLedgerTotals,
+    val shootingTotalMeters: Long = 0L,
     val records: List<WorkRecord>,
     val projectBreakdown: List<ProjectSummary>,
     val expensesByCategory: Map<ExpenseCategory, Long>,

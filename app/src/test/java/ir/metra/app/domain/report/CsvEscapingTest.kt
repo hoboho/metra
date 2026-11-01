@@ -86,7 +86,7 @@ class CsvEscapingTest {
 
     @Test
     fun `the header row includes the financial totals`() {
-        assertThat(ReportFileWriter.CSV_HEADER).hasSize(15)
+        assertThat(ReportFileWriter.CSV_HEADER).hasSize(16)
         assertThat(ReportFileWriter.CSV_HEADER.first()).isEqualTo("تاریخ")
         assertThat(ReportFileWriter.CSV_HEADER.last()).isEqualTo("توضیحات")
         // Expenses are reimbursable and salary is monthly, so the per-day export
@@ -95,6 +95,7 @@ class CsvEscapingTest {
         assertThat(ReportFileWriter.CSV_HEADER).contains("کل مطالبات")
         assertThat(ReportFileWriter.CSV_HEADER).contains("دریافتی از شرکت")
         assertThat(ReportFileWriter.CSV_HEADER).contains("مانده مطالبات")
+        assertThat(ReportFileWriter.CSV_HEADER).contains("جمع شوتینگ فیبر (متر)")
         assertThat(ReportFileWriter.CSV_HEADER.filter { it.contains("خالص") }).isEmpty()
     }
 

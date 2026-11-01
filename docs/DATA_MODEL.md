@@ -278,4 +278,10 @@ catalog seeds 6, 12, 24, 48, 96 and 144 cores. The unique core-count index
 prevents duplicate types while allowing future types to be added.
 
 The shooting database has its own Room schema version and does not alter the
-existing `MetraDatabase` version or its migration chain.
+existing `MetraDatabase` version or its migration chain. Version 4 portable
+backups include the cable catalog, report headers and route rows; cable types
+are remapped by core count and project links by the saved project-name snapshot
+when restored on another installation. Replace restore also clears this store
+only after writing the full safety snapshot. Shooting totals are kept separate
+from trench-work totals and are shown as a distinct metric in statistics and
+report exports.

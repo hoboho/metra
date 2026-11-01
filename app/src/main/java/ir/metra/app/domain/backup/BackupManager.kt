@@ -6,6 +6,9 @@ import ir.metra.app.core.notification.ReminderScheduler
 import kotlinx.coroutines.flow.first
 import androidx.room.withTransaction
 import ir.metra.app.core.backup.PreferencesDto
+import ir.metra.app.core.backup.ShootingCableTypeDto
+import ir.metra.app.core.backup.ShootingOperationDto
+import ir.metra.app.core.backup.ShootingReportDto
 import ir.metra.app.core.backup.toDomain
 import ir.metra.app.core.backup.AppSettingsDto
 import ir.metra.app.core.backup.BackupCipher
@@ -46,6 +49,10 @@ import ir.metra.app.domain.repository.ProjectRepository
 import ir.metra.app.domain.repository.SettingsRepository
 import ir.metra.app.domain.repository.UserRepository
 import ir.metra.app.domain.repository.WorkRecordRepository
+import ir.metra.app.domain.repository.ShootingBackupRepository
+import ir.metra.app.domain.model.ShootingCableTypeBackup
+import ir.metra.app.domain.model.ShootingReportBackup
+import ir.metra.app.domain.model.ShootingRouteBackup
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.security.MessageDigest
@@ -77,6 +84,7 @@ class BackupManager @Inject constructor(
     private val reminderScheduler: ReminderScheduler,
     private val backupMetadataDao: BackupMetadataDao,
     private val database: MetraDatabase,
+    private val shootingRepository: ShootingBackupRepository,
     private val backupCipher: BackupCipher,
     private val dateFormatter: DateFormatter,
     private val clock: Clock,
@@ -125,6 +133,7 @@ class BackupManager @Inject constructor(
             }
         }
 
+        val (shootingCableTypes, shootingReports) = collectShootingData()
         val payload = BackupPayload(
             formatVersion = BackupPayload.CURRENT_FORMAT_VERSION,
             appVersionName = appInfo.info().versionName,
@@ -147,6 +156,8 @@ class BackupManager @Inject constructor(
                     onboardingCompleted = prefs.onboardingCompleted,
                 )
             },
+            shootingCableTypes = shootingCableTypes,
+            shootingReports = shootingReports,
         )
 
         val encoded = json.encodeToString(BackupPayload.serializer(), payload).toByteArray(Charsets.UTF_8)
@@ -189,6 +200,7 @@ class BackupManager @Inject constructor(
         ).let { records ->
             records.sumOf { workRecordRepository.getRecordWithExpenses(it.id)?.second?.size ?: 0 }
         }
+        val existingShootingReports = shootingRepository.backupReports().size
         success(
             RestorePreview(
                 formatVersion = payload.formatVersion,
@@ -201,6 +213,8 @@ class BackupManager @Inject constructor(
                 existingProjects = existingProjects,
                 existingWorkRecords = existingRecords,
                 existingExpenses = existingExpenses,
+                incomingShootingReports = payload.shootingReports.size,
+                existingShootingReports = existingShootingReports,
                 encrypted = backupCipher.isEncrypted(sourceFile.readBytes()),
                 formatSupported = payload.formatVersion <= BackupPayload.CURRENT_FORMAT_VERSION,
             ),
@@ -228,10 +242,11 @@ class BackupManager @Inject constructor(
             )
         }
 
+        validateShootingPayload(payload)
+
         // 1. Safety snapshot of whatever is there now.
         val snapshot = File(safetySnapshotDirectory, "metra-safety-${System.currentTimeMillis()}.metra")
-        val snapshotResult = export(snapshot)
-        val snapshotPath = snapshotResult.getOrNull()?.absolutePath
+        val snapshotPath = export(snapshot).getOrThrow().absolutePath
 
         val now = clock.nowEpochMilli()
 
@@ -244,6 +259,7 @@ class BackupManager @Inject constructor(
                 database.paymentRuleDao().deleteAll()
                 database.projectDao().deleteAll()
             }
+            shootingRepository.clearShootingData()
         }
 
         // 3. Projects. Prefer the stable uuid (survives renames); fall back to
@@ -427,6 +443,57 @@ class BackupManager @Inject constructor(
             ledgerByKey[ledgerKey(incoming)] = incoming.copy(id = id)
         }
 
+        if (payload.shootingReports.isNotEmpty() && payload.shootingCableTypes.isEmpty()) {
+            shootingRepository.seedDefaultCableTypes()
+        }
+        val cableTypeIds = shootingRepository.restoreCableTypes(
+            payload.shootingCableTypes.map { type ->
+                ShootingCableTypeBackup(type.coreCount, type.label, type.isActive)
+            },
+        )
+        val allProjectIdsByName = projectRepository.getProjects().associate { it.name to it.id }
+        val existingShooting = shootingRepository.backupReports()
+            .associateBy(::shootingReportKey)
+            .toMutableMap()
+        var shootingReportsImported = 0
+        for (dto in payload.shootingReports) {
+            require(dto.operations.isNotEmpty()) { "Shooting report has no routes" }
+            val existing = existingShooting[shootingReportKey(dto)]
+            if (existing != null && strategy == RestoreStrategy.ADD_ONLY) continue
+            val report = ShootingReportBackup(
+                localId = existing?.localId ?: 0L,
+                projectId = projectNameToId[dto.projectName] ?: allProjectIdsByName[dto.projectName],
+                projectName = dto.projectName,
+                workDateEpochDay = dto.workDateEpochDay,
+                workArea = dto.workArea,
+                employer = dto.employer,
+                supervisor = dto.supervisor,
+                workerCount = dto.workerCount,
+                notes = dto.notes,
+                totalMeters = dto.totalMeters,
+                createdAtEpochMilli = dto.createdAtEpochMilli,
+                updatedAtEpochMilli = dto.updatedAtEpochMilli,
+                operations = dto.operations.map { operation ->
+                    require(operation.cableCoreCount in cableTypeIds) {
+                        "Missing cable type ${operation.cableCoreCount} core"
+                    }
+                    ShootingRouteBackup(
+                        startPointType = operation.startPointType,
+                        startPointCode = operation.startPointCode,
+                        startMeter = operation.startMeter,
+                        endPointType = operation.endPointType,
+                        endPointCode = operation.endPointCode,
+                        endMeter = operation.endMeter,
+                        cableCoreCount = operation.cableCoreCount,
+                        operationMeters = operation.operationMeters,
+                    )
+                },
+            )
+            val restoredId = shootingRepository.restoreReport(report, existing?.localId)
+            existingShooting[shootingReportKey(dto)] = report.copy(localId = restoredId)
+            shootingReportsImported++
+        }
+
         backupMetadataDao.upsert(
             BackupMetadataEntity(
                 fileName = sourceFile.name,
@@ -449,6 +516,7 @@ class BackupManager @Inject constructor(
                 workRecordsImported = recordsImported,
                 expensesImported = expensesImported,
                 paymentRulesImported = rulesImported,
+                shootingReportsImported = shootingReportsImported,
                 safetySnapshotFile = snapshotPath,
             ),
         )
@@ -508,6 +576,7 @@ class BackupManager @Inject constructor(
                 expenses += expense.toDto(workRecordIndex = index)
             }
         }
+        val (shootingCableTypes, shootingReports) = collectShootingData()
         success(
             BackupPayload(
                 formatVersion = BackupPayload.CURRENT_FORMAT_VERSION,
@@ -520,9 +589,88 @@ class BackupManager @Inject constructor(
                 projects = projects.map { it.toDto() },
                 workRecords = records.map { it.toDto() },
                 expenses = expenses,
+                reportConfigurations = emptyList(),
+                ledgerEntries = ledgerRepository.getEntries().map { it.toDto() },
+                preferences = preferencesRepository.preferences.first().let { prefs ->
+                    PreferencesDto(
+                        themeMode = prefs.themeMode.name,
+                        reminderEnabled = prefs.reminderEnabled,
+                        reminderMinuteOfDay = prefs.reminderMinuteOfDay,
+                        usePreviousWorkdayInfo = prefs.usePreviousWorkdayInfo,
+                        onboardingCompleted = prefs.onboardingCompleted,
+                    )
+                },
+                shootingCableTypes = shootingCableTypes,
+                shootingReports = shootingReports,
             ),
         )
     }.fold({ it }, { failure(MetraError.Unknown(it.message ?: "collect")) })
+
+    private fun validateShootingPayload(payload: BackupPayload) {
+        val cableCounts = payload.shootingCableTypes.map { it.coreCount }.toSet().ifEmpty {
+            setOf(6, 12, 24, 48, 96, 144)
+        }
+        require(payload.shootingCableTypes.all { it.coreCount > 0 && it.label.isNotBlank() }) {
+            "Invalid shooting cable catalog"
+        }
+        payload.shootingReports.forEach { report ->
+            require(report.projectName.isNotBlank() && report.workerCount >= 0 && report.operations.isNotEmpty()) {
+                "Invalid shooting report header"
+            }
+            val total = report.operations.fold(0L) { sum, operation ->
+                require(
+                    operation.startMeter >= 0 && operation.endMeter >= 0 &&
+                        operation.startPointCode.isNotBlank() && operation.endPointCode.isNotBlank() &&
+                        operation.cableCoreCount in cableCounts,
+                ) { "Invalid shooting route" }
+                val meters = if (operation.endMeter >= operation.startMeter) {
+                    operation.endMeter - operation.startMeter
+                } else {
+                    operation.startMeter - operation.endMeter
+                }
+                require(operation.operationMeters == meters) { "Shooting route length does not match its counters" }
+                Math.addExact(sum, meters)
+            }
+            require(report.totalMeters == total) { "Shooting report total does not match its routes" }
+        }
+    }
+
+    private suspend fun collectShootingData(): Pair<List<ShootingCableTypeDto>, List<ShootingReportDto>> {
+        val cableTypes = shootingRepository.backupCableTypes()
+        val reportDtos = shootingRepository.backupReports().map { report ->
+            ShootingReportDto(
+                projectName = report.projectName,
+                workDateEpochDay = report.workDateEpochDay,
+                workArea = report.workArea,
+                employer = report.employer,
+                supervisor = report.supervisor,
+                workerCount = report.workerCount,
+                notes = report.notes,
+                totalMeters = report.totalMeters,
+                createdAtEpochMilli = report.createdAtEpochMilli,
+                updatedAtEpochMilli = report.updatedAtEpochMilli,
+                operations = report.operations.map { operation ->
+                    ShootingOperationDto(
+                        startPointType = operation.startPointType,
+                        startPointCode = operation.startPointCode,
+                        startMeter = operation.startMeter,
+                        endPointType = operation.endPointType,
+                        endPointCode = operation.endPointCode,
+                        endMeter = operation.endMeter,
+                        cableCoreCount = operation.cableCoreCount,
+                        operationMeters = operation.operationMeters,
+                    )
+                },
+            )
+        }
+        return cableTypes.map { ShootingCableTypeDto(it.coreCount, it.label, it.isActive) } to reportDtos
+    }
+
+    private fun shootingReportKey(report: ShootingReportBackup): String =
+        listOf(report.workDateEpochDay, report.projectName, report.createdAtEpochMilli).joinToString("|")
+
+    private fun shootingReportKey(report: ShootingReportDto): String =
+        listOf(report.workDateEpochDay, report.projectName, report.createdAtEpochMilli).joinToString("|")
 
     private fun sha256(bytes: ByteArray): String =
         MessageDigest.getInstance("SHA-256").digest(bytes).joinToString("") { "%02x".format(it) }

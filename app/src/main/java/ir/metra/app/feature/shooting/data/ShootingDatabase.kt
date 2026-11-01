@@ -49,12 +49,32 @@ data class CableTypeEntity(
 interface ShootingDao {
     @Query("SELECT * FROM shooting_reports ORDER BY work_date_epoch_day DESC, id DESC")
     fun observeReports(): Flow<List<ShootingReportEntity>>
+    @Query("SELECT * FROM shooting_reports ORDER BY work_date_epoch_day DESC, id DESC")
+    suspend fun getAllReports(): List<ShootingReportEntity>
+    @Query("SELECT * FROM shooting_reports WHERE id = :reportId")
+    suspend fun getReport(reportId: Long): ShootingReportEntity?
     @Query("SELECT * FROM shooting_operations WHERE report_id = :reportId ORDER BY id")
     suspend fun getOperations(reportId: Long): List<ShootingOperationEntity>
-    @Query("SELECT * FROM cable_types WHERE is_active = 1 ORDER BY core_count")
+    @Query("DELETE FROM shooting_operations WHERE report_id = :reportId")
+    suspend fun deleteOperationsForReport(reportId: Long)
+    @Update
+    suspend fun updateReport(report: ShootingReportEntity)
+    @Query("DELETE FROM shooting_reports")
+    suspend fun deleteAllReports()
+    @Query("SELECT * FROM cable_types ORDER BY core_count")
     fun observeCableTypes(): Flow<List<CableTypeEntity>>
-    @Query("SELECT * FROM cable_types WHERE is_active = 1 ORDER BY core_count")
+    @Query("SELECT * FROM cable_types ORDER BY core_count")
     suspend fun getCableTypes(): List<CableTypeEntity>
+    @Query("SELECT * FROM cable_types ORDER BY core_count")
+    suspend fun getAllCableTypes(): List<CableTypeEntity>
+    @Query("SELECT * FROM cable_types WHERE core_count = :coreCount LIMIT 1")
+    suspend fun getCableTypeByCoreCount(coreCount: Int): CableTypeEntity?
+    @Query("SELECT EXISTS(SELECT 1 FROM cable_types WHERE id = :id)")
+    suspend fun cableTypeExists(id: Long): Boolean
+    @Update
+    suspend fun updateCableType(item: CableTypeEntity)
+    @Query("DELETE FROM cable_types")
+    suspend fun deleteAllCableTypes()
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertCableTypes(items: List<CableTypeEntity>)
     @Insert

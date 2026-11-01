@@ -78,6 +78,28 @@ class BackupPayloadTest {
                 createdAtEpochMilli = 1_700_000_000_000L,
             ).toDto(workRecordIndex = 0),
         ),
+        shootingCableTypes = listOf(ShootingCableTypeDto(coreCount = 12, label = "۱۲ کور")),
+        shootingReports = listOf(
+            ShootingReportDto(
+                projectName = project.name,
+                workDateEpochDay = 19_700L,
+                totalMeters = 460L,
+                createdAtEpochMilli = 1_700_000_000_100L,
+                updatedAtEpochMilli = 1_700_000_000_100L,
+                operations = listOf(
+                    ShootingOperationDto(
+                        startPointType = "ODC",
+                        startPointCode = "A-1",
+                        startMeter = 1_120L,
+                        endPointType = "FAT",
+                        endPointCode = "B-2",
+                        endMeter = 1_580L,
+                        cableCoreCount = 12,
+                        operationMeters = 460L,
+                    ),
+                ),
+            ),
+        ),
     )
 
     @Test
@@ -129,6 +151,26 @@ class BackupPayloadTest {
         assertThat(counts.workRecords).isEqualTo(1)
         assertThat(counts.expenses).isEqualTo(1)
         assertThat(counts.paymentRules).isEqualTo(1)
+        assertThat(counts.shootingReports).isEqualTo(1)
+    }
+
+    @Test
+    fun `shooting reports and cable types survive backup round trip`() {
+        val encoded = json.encodeToString(BackupPayload.serializer(), payload)
+        val decoded = json.decodeFromString(BackupPayload.serializer(), encoded)
+        assertThat(decoded.shootingCableTypes.single().coreCount).isEqualTo(12)
+        assertThat(decoded.shootingReports.single().operations.single().operationMeters).isEqualTo(460L)
+        assertThat(decoded.shootingReports.single().projectName).isEqualTo(project.name)
+    }
+
+    @Test
+    fun `version three backups default shooting collections to empty`() {
+        val legacyJson = """
+            {"formatVersion":3,"appVersionName":"1.10.0","appVersionCode":10,"exportedAtEpochMilli":1}
+        """.trimIndent()
+        val decoded = json.decodeFromString(BackupPayload.serializer(), legacyJson)
+        assertThat(decoded.shootingReports).isEmpty()
+        assertThat(decoded.shootingCableTypes).isEmpty()
     }
 
     @Test

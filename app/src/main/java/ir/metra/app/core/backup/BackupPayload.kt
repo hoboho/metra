@@ -38,6 +38,8 @@ data class BackupPayload(
     // DataStore preferences live outside Room, so without this block a restore
     // silently resets the theme, the reminder and the prefill toggle.
     val preferences: PreferencesDto? = null,
+    val shootingCableTypes: List<ShootingCableTypeDto> = emptyList(),
+    val shootingReports: List<ShootingReportDto> = emptyList(),
 ) {
     fun counts(): BackupCounts = BackupCounts(
         projects = projects.size,
@@ -46,10 +48,11 @@ data class BackupPayload(
         paymentRules = paymentRules.size,
         ledgerEntries = ledgerEntries.size,
         preferences = if (preferences != null) 1 else 0,
+        shootingReports = shootingReports.size,
     )
 
     companion object {
-        const val CURRENT_FORMAT_VERSION = 3
+        const val CURRENT_FORMAT_VERSION = 4
         const val MAGIC = "METRA-BACKUP"
     }
 }
@@ -62,6 +65,41 @@ data class BackupCounts(
     val paymentRules: Int,
     val ledgerEntries: Int = 0,
     val preferences: Int = 0,
+    val shootingReports: Int = 0,
+)
+
+@Serializable
+data class ShootingCableTypeDto(
+    val coreCount: Int,
+    val label: String,
+    val isActive: Boolean = true,
+)
+
+@Serializable
+data class ShootingOperationDto(
+    val startPointType: String,
+    val startPointCode: String,
+    val startMeter: Long,
+    val endPointType: String,
+    val endPointCode: String,
+    val endMeter: Long,
+    val cableCoreCount: Int,
+    val operationMeters: Long,
+)
+
+@Serializable
+data class ShootingReportDto(
+    val projectName: String,
+    val workDateEpochDay: Long,
+    val workArea: String = "",
+    val employer: String = "",
+    val supervisor: String = "",
+    val workerCount: Int = 0,
+    val notes: String = "",
+    val totalMeters: Long,
+    val createdAtEpochMilli: Long,
+    val updatedAtEpochMilli: Long,
+    val operations: List<ShootingOperationDto> = emptyList(),
 )
 
 @Serializable

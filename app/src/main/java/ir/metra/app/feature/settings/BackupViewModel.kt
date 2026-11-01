@@ -182,6 +182,7 @@ class BackupViewModel @Inject constructor(
                             outcome.projectsImported.toString(),
                             outcome.workRecordsImported.toString(),
                             outcome.expensesImported.toString(),
+                            outcome.shootingReportsImported.toString(),
                         ),
                         )
                     }

@@ -22,6 +22,7 @@ import ir.metra.app.domain.report.ReportFileWriter
 import ir.metra.app.domain.report.ReportRequest
 import ir.metra.app.domain.repository.ProjectRepository
 import ir.metra.app.domain.repository.LedgerRepository
+import ir.metra.app.domain.repository.ShootingSummaryRepository
 import kotlinx.coroutines.flow.first
 import ir.metra.app.domain.repository.WorkStatisticsRepository
 import kotlinx.coroutines.Dispatchers
@@ -54,6 +55,7 @@ data class ReportsUiState(
     data class TotalsUi(
         val workdays: String = "",
         val meters: String = "",
+        val shootingMeters: String = "",
         val average: String = "",
         val additionalMeters: String = "",
         val additionalPayment: String = "",
@@ -84,6 +86,7 @@ class ReportsViewModel @Inject constructor(
     private val statisticsRepository: WorkStatisticsRepository,
     private val projectRepository: ProjectRepository,
     private val ledgerRepository: LedgerRepository,
+    private val shootingSummaryRepository: ShootingSummaryRepository,
     private val dateFormatter: DateFormatter,
     private val numberFormatter: NumberFormatter,
     private val strings: StringProvider,
@@ -383,13 +386,22 @@ class ReportsViewModel @Inject constructor(
                 projectId = if (current.reportType == ReportType.PROJECT) current.selectedProjectId else null,
             )
             val ledger = ledgerRepository.observeSummaryBetween(current.startEpochDay, current.endEpochDay).first()
-            _state.update { it.copy(totals = totals, totalsUi = totals.toUi(ledger)) }
+            val shootingMeters = shootingSummaryRepository.totalMeters(
+                startEpochDay = current.startEpochDay,
+                endEpochDay = current.endEpochDay,
+                projectId = if (current.reportType == ReportType.PROJECT) current.selectedProjectId else null,
+            )
+            _state.update { it.copy(totals = totals, totalsUi = totals.toUi(ledger, shootingMeters)) }
         }
     }
 
-    private fun WorkTotals.toUi(ledger: ir.metra.app.domain.model.LedgerSummary): ReportsUiState.TotalsUi = ReportsUiState.TotalsUi(
+    private fun WorkTotals.toUi(
+        ledger: ir.metra.app.domain.model.LedgerSummary,
+        shootingMeters: Long,
+    ): ReportsUiState.TotalsUi = ReportsUiState.TotalsUi(
         workdays = numberFormatter.formatPersian(workdays.toLong()),
         meters = numberFormatter.formatMetersValue(totalMeters),
+        shootingMeters = numberFormatter.formatPersian(shootingMeters),
         average = numberFormatter.formatAverage(averageMetersPerDay),
         additionalMeters = numberFormatter.formatMetersValue(totalAdditionalMeters),
         additionalPayment = numberFormatter.formatToman(totalAdditionalPayment),

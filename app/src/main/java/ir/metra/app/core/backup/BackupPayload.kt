@@ -39,6 +39,7 @@ data class BackupPayload(
     // silently resets the theme, the reminder and the prefill toggle.
     val preferences: PreferencesDto? = null,
     val companyExpenses: List<CompanyExpenseDto> = emptyList(),\n    val expenseSettlements: List<ExpenseSettlementDto> = emptyList(),
+    val shootingReports: List<ShootingReportDto> = emptyList(),
 ) {
     fun counts(): BackupCounts = BackupCounts(
         projects = projects.size,
@@ -161,6 +162,31 @@ data class ExpenseSettlementDto(
     val amount: Long,
     val notes: String = "",
     val createdAtEpochMilli: Long,
+)
+
+@Serializable
+data class ShootingOperationDto(
+    val startPointType: String,
+    val startPointCode: String,
+    val startMeter: Long,
+    val endPointType: String,
+    val endPointCode: String,
+    val endMeter: Long,
+    val cableCoreCount: Int,
+)
+
+@Serializable
+data class ShootingReportDto(
+    val projectName: String,
+    val dateEpochDay: Long,
+    val workArea: String,
+    val employer: String,
+    val supervisor: String,
+    val workerCount: Int = 0,
+    val notes: String = "",
+    val createdAtEpochMilli: Long,
+    val updatedAtEpochMilli: Long,
+    val operations: List<ShootingOperationDto> = emptyList(),
 )
 
 @Serializable

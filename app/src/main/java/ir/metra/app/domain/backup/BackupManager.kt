@@ -21,6 +21,10 @@ import ir.metra.app.core.backup.UserProfileDto
 import ir.metra.app.core.backup.WorkRecordDto
 import ir.metra.app.core.backup.CompanyExpenseDto
 import ir.metra.app.core.backup.ExpenseSettlementDto
+import ir.metra.app.core.backup.ShootingReportDto
+import ir.metra.app.core.backup.ShootingOperationDto
+import ir.metra.app.feature.shooting.data.ShootingReportEntity
+import ir.metra.app.feature.shooting.data.ShootingOperationEntity
 import ir.metra.app.feature.shooting.data.ShootingRepository
 import ir.metra.app.feature.shooting.data.CompanyExpenseEntity
 import ir.metra.app.feature.shooting.data.ExpenseSettlementEntity
@@ -142,6 +146,28 @@ class BackupManager @Inject constructor(
             }
         }
 
+        val cableCoreCounts = shootingRepository.allCableTypes().associate { it.id to it.coreCount }
+        val shootingReportDtos = shootingRepository.allShootingReports().map { report ->
+            ShootingReportDto(
+                projectName = report.projectName,
+                dateEpochDay = report.workDateEpochDay,
+                workArea = report.workArea,
+                employer = report.employer,
+                supervisor = report.supervisor,
+                workerCount = report.workerCount,
+                notes = report.notes,
+                createdAtEpochMilli = report.createdAtEpochMilli,
+                updatedAtEpochMilli = report.updatedAtEpochMilli,
+                operations = shootingRepository.allShootingOperations(report.id).map { operation ->
+                    ShootingOperationDto(
+                        operation.startPointType, operation.startPointCode, operation.startMeter,
+                        operation.endPointType, operation.endPointCode, operation.endMeter,
+                        cableCoreCounts[operation.cableTypeId] ?: 0,
+                    )
+                },
+            )
+        }
+
         val payload = BackupPayload(
             formatVersion = BackupPayload.CURRENT_FORMAT_VERSION,
             appVersionName = appInfo.info().versionName,
@@ -155,6 +181,7 @@ class BackupManager @Inject constructor(
             expenses = expenses,
             companyExpenses = companyExpenseDtos,
             expenseSettlements = settlementDtos,
+            shootingReports = shootingReportDtos,
             reportConfigurations = emptyList(),
             ledgerEntries = ledgerRepository.getEntries().map { it.toDto() },
             preferences = preferencesRepository.preferences.first().let { prefs ->
@@ -571,6 +598,28 @@ class BackupManager @Inject constructor(
                 ExpenseSettlementDto(index, settlement.settlementDateEpochDay, settlement.amount, settlement.notes, settlement.createdAtEpochMilli)
             }
         }
+        val cableCoreCounts = shootingRepository.allCableTypes().associate { it.id to it.coreCount }
+        val shootingReportDtos = shootingRepository.allShootingReports().map { report ->
+            ShootingReportDto(
+                projectName = report.projectName,
+                dateEpochDay = report.workDateEpochDay,
+                workArea = report.workArea,
+                employer = report.employer,
+                supervisor = report.supervisor,
+                workerCount = report.workerCount,
+                notes = report.notes,
+                createdAtEpochMilli = report.createdAtEpochMilli,
+                updatedAtEpochMilli = report.updatedAtEpochMilli,
+                operations = shootingRepository.allShootingOperations(report.id).map { operation ->
+                    ShootingOperationDto(
+                        operation.startPointType, operation.startPointCode, operation.startMeter,
+                        operation.endPointType, operation.endPointCode, operation.endMeter,
+                        cableCoreCounts[operation.cableTypeId] ?: 0,
+                    )
+                },
+            )
+        }
+
         success(
             BackupPayload(
                 formatVersion = BackupPayload.CURRENT_FORMAT_VERSION,
@@ -585,6 +634,7 @@ class BackupManager @Inject constructor(
                 expenses = expenses,
                 companyExpenses = companyExpenseDtos,
                 expenseSettlements = settlementDtos,
+                shootingReports = shootingReportDtos,
             ),
         )
     }.fold({ it }, { failure(MetraError.Unknown(it.message ?: "collect")) })

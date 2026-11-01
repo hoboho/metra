@@ -19,6 +19,11 @@ import ir.metra.app.core.backup.ReportConfigurationDto
 import ir.metra.app.core.backup.toDto
 import ir.metra.app.core.backup.UserProfileDto
 import ir.metra.app.core.backup.WorkRecordDto
+import ir.metra.app.core.backup.CompanyExpenseDto
+import ir.metra.app.core.backup.ExpenseSettlementDto
+import ir.metra.app.feature.shooting.data.ShootingRepository
+import ir.metra.app.feature.shooting.data.CompanyExpenseEntity
+import ir.metra.app.feature.shooting.data.ExpenseSettlementEntity
 import ir.metra.app.core.backup.toDto
 import ir.metra.app.core.backup.BackupDirectoryProvider
 import ir.metra.app.core.common.Clock
@@ -77,6 +82,7 @@ class BackupManager @Inject constructor(
     private val reminderScheduler: ReminderScheduler,
     private val backupMetadataDao: BackupMetadataDao,
     private val database: MetraDatabase,
+    private val shootingRepository: ShootingRepository,
     private val backupCipher: BackupCipher,
     private val dateFormatter: DateFormatter,
     private val clock: Clock,

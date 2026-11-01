@@ -32,7 +32,7 @@ fun ShootingScreen(viewModel: ShootingViewModel = hiltViewModel()) {
                             OutlinedTextField(s.projectName,{},readOnly=true,label={Text("پروژه")},trailingIcon={ExposedDropdownMenuDefaults.TrailingIcon(projectMenu)},modifier=Modifier.menuAnchor().fillMaxWidth())
                             ExposedDropdownMenu(projectMenu,{projectMenu=false}) { s.projects.forEach { p -> DropdownMenuItem(text={Text(p.name)},onClick={viewModel.selectProject(p.id);projectMenu=false}) } }
                         }
-                        Field("تاریخ (YYYY-MM-DD)", LocalDate.ofEpochDay(s.date).toString(), false) { v -> runCatching { LocalDate.parse(v).toEpochDay() }.onSuccess { /* date updated below */ } }
+                        Field("تاریخ (YYYY-MM-DD)", LocalDate.ofEpochDay(s.date).toString(), false) { v -> runCatching { LocalDate.parse(v).toEpochDay() }.onSuccess(viewModel::updateDate) }
                         Field("محدوده کار",s.workArea) { viewModel.header("area",it) }
                         Field("کارفرما",s.employer) { viewModel.header("employer",it) }
                         Field("ناظر",s.supervisor) { viewModel.header("supervisor",it) }

@@ -37,7 +37,9 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Run JVM unit tests
-        run: ./gradlew :app:testDebugUnitTest --no-daemon --stacktrace
+        run: |
+          set -o pipefail
+          ./gradlew :app:testDebugUnitTest --no-daemon --stacktrace --console=plain 2>&1 | tee gradle-unit-tests.log
 
       - name: Run Android lint
         run: ./gradlew :app:lintDebug --no-daemon --stacktrace
@@ -59,6 +61,7 @@ jobs:
         with:
           name: quality-reports
           path: |
+            gradle-unit-tests.log
             app/build/reports/tests/
             app/build/reports/lint-results-debug.html
           if-no-files-found: ignore
@@ -96,13 +99,17 @@ jobs:
           profile: pixel_5
           disable-animations: true
           avd-name: metra-api34
-          script: ./gradlew :app:connectedDebugAndroidTest --no-daemon --stacktrace
+          script: |
+            set -o pipefail
+            ./gradlew :app:connectedDebugAndroidTest --no-daemon --stacktrace --console=plain 2>&1 | tee instrumented-tests.log
 
       - name: Upload instrumented test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: instrumented-test-reports
-          path: app/build/reports/androidTests/
+          path: |
+            instrumented-tests.log
+            app/build/reports/androidTests/
           if-no-files-found: ignore
           retention-days: 14

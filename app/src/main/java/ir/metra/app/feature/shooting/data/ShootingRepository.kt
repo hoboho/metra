@@ -65,6 +65,7 @@ class ShootingRepository @Inject constructor(
     suspend fun total(start: Long, end: Long) = dao.totalMeters(start, end)
 
 
+    suspend fun clearShootingReports() = dao.deleteAllShootingReports()
     suspend fun allShootingReports() = dao.reportsInRange(0L, Long.MAX_VALUE)
     suspend fun allShootingOperations(reportId: Long) = dao.getOperations(reportId)
     suspend fun allCableTypes() = dao.getCableTypes()

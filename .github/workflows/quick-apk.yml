@@ -74,5 +74,7 @@ jobs:
       - name: Fail if APK build failed
         if: steps.assemble.outcome == 'failure'
         run: |
-          echo "::error::APK build failed. Final Gradle output: $(tail -n 60 apk-build.log | tr '\n' ' ')"
+          details="$(grep -E '(^e: |error:|What went wrong|Execution failed for task|Compilation error)' apk-build.log | tail -n 30)"
+          if [ -z "$details" ]; then details="$(tail -n 40 apk-build.log)"; fi
+          echo "::error::APK build failed. Compiler/Gradle details: $(printf '%s' "$details" | tr '\n' ' ')"
           exit 1

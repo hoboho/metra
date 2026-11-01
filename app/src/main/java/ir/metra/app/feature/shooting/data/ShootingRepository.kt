@@ -64,7 +64,17 @@ class ShootingRepository @Inject constructor(
     suspend fun reports(start: Long, end: Long) = dao.reportsInRange(start, end)
     suspend fun total(start: Long, end: Long) = dao.totalMeters(start, end)
 
-    suspend fun addCompanyExpense(expense: CompanyExpenseEntity): Long {
+
+    suspend fun allShootingReports() = dao.reportsInRange(0L, Long.MAX_VALUE)
+    suspend fun allShootingOperations(reportId: Long) = dao.getOperations(reportId)
+    suspend fun allCableTypes() = dao.getCableTypes()
+    suspend fun importShootingReport(report: ShootingReportEntity, operations: List<ShootingOperationEntity>): Long =
+        database.withTransaction {
+            val id = dao.insertReport(report.copy(id = 0L))
+            dao.insertOperations(operations.map { it.copy(id = 0L, reportId = id) })
+            id
+        }
+\n    suspend fun addCompanyExpense(expense: CompanyExpenseEntity): Long {
         require(expense.amount > 0L)
         return dao.insertCompanyExpense(expense)
     }

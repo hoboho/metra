@@ -20,6 +20,9 @@ data class CombinedReportState(
     val shooting: List<ShootingReportEntity> = emptyList(),
     val trenchMeters: Long = 0,
     val shootingMeters: Long = 0,
+    val companyExpenseTotal: Long = 0,
+    val companyExpenseSettled: Long = 0,
+    val companyExpenseOutstanding: Long = 0,
     val loading: Boolean = false,
 )
 @HiltViewModel
@@ -34,10 +37,16 @@ class CombinedReportViewModel @Inject constructor(
             _state.update { it.copy(loading = true) }
             val trench = workRecords.getRecordsInRangeAscending(start, end).filter { projectId == null || it.projectId == projectId }
             val shot = shooting.combinedReports(start, end, projectId)
+            val expenseRows = shooting.companyExpenses(start, end).filter { projectId == null || it.first.projectId == projectId }
+            val expenseTotal = expenseRows.sumOf { it.first.amount }
+            val expenseSettled = expenseRows.sumOf { it.second }
             _state.update { it.copy(
                 trench = trench, shooting = shot,
                 trenchMeters = trench.sumOf { it.dailyMeters.toLong() },
                 shootingMeters = shot.sumOf { it.totalMeters },
+                companyExpenseTotal = expenseTotal,
+                companyExpenseSettled = expenseSettled,
+                companyExpenseOutstanding = (expenseTotal - expenseSettled).coerceAtLeast(0L),
                 loading = false,
             ) }
         }

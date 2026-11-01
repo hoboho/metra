@@ -50,7 +50,7 @@ data class BackupPayload(
     )
 
     companion object {
-        const val CURRENT_FORMAT_VERSION = 3
+        const val CURRENT_FORMAT_VERSION = 4
         const val MAGIC = "METRA-BACKUP"
     }
 }
@@ -139,6 +139,27 @@ data class ExpenseDto(
     val amount: Long,
     val category: String,
     val description: String = "",
+    val createdAtEpochMilli: Long,
+)
+
+@Serializable
+data class CompanyExpenseDto(
+    val projectName: String,
+    val dateEpochDay: Long,
+    val activity: String,
+    val category: String,
+    val amount: Long,
+    val description: String = "",
+    val receiptReference: String = "",
+    val createdAtEpochMilli: Long,
+)
+
+@Serializable
+data class ExpenseSettlementDto(
+    val expenseIndex: Int,
+    val dateEpochDay: Long,
+    val amount: Long,
+    val notes: String = "",
     val createdAtEpochMilli: Long,
 )
 

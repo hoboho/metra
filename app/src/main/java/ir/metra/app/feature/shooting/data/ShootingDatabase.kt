@@ -87,6 +87,14 @@ interface ShootingDao {
     suspend fun deleteAllSettlements()
     @Query("DELETE FROM company_expenses")
     suspend fun deleteAllCompanyExpenses()
+    @Query("SELECT * FROM expense_settlements ORDER BY settlement_date_epoch_day, id")
+    suspend fun allSettlements(): List<ExpenseSettlementEntity>
+    @Query("SELECT * FROM shooting_reports WHERE work_date_epoch_day BETWEEN :start AND :end AND (:projectId IS NULL OR project_id = :projectId) ORDER BY work_date_epoch_day, id")
+    suspend fun reportsInRangeForProject(start: Long, end: Long, projectId: Long?): List<ShootingReportEntity>
+    @Insert
+    suspend fun insertCompanyExpenses(items: List<CompanyExpenseEntity>)
+    @Insert
+    suspend fun insertSettlements(items: List<ExpenseSettlementEntity>)
 }
 
 @Database(entities = [ShootingReportEntity::class, ShootingOperationEntity::class, CableTypeEntity::class, CompanyExpenseEntity::class, ExpenseSettlementEntity::class], version = 2, exportSchema = true)

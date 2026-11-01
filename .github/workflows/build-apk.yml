@@ -44,7 +44,11 @@ jobs:
           ./gradlew :app:testDebugUnitTest --no-daemon --stacktrace --console=plain 2>&1 | tee gradle-unit-tests.log
 
       - name: Run Android lint
-        run: ./gradlew :app:lintDebug --no-daemon --stacktrace
+        id: android-lint
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          ./gradlew :app:lintDebug --no-daemon --stacktrace --console=plain 2>&1 | tee gradle-lint.log
 
       - name: Assemble installable debug APK
         run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
@@ -64,6 +68,7 @@ jobs:
           name: quality-reports
           path: |
             gradle-unit-tests.log
+            gradle-lint.log
             app/build/reports/tests/
             app/build/reports/lint-results-debug.html
           if-no-files-found: ignore
@@ -78,11 +83,17 @@ jobs:
             if [ -f gradle-unit-tests.log ]; then tail -n 120 gradle-unit-tests.log; else echo 'No test log was produced.'; fi
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo '### Android lint output (last 120 lines)'
+            echo '```text'
+            if [ -f gradle-lint.log ]; then tail -n 120 gradle-lint.log; else echo 'No lint log was produced.'; fi
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Fail the job if JVM unit tests failed
-        if: steps.unit-tests.outcome == 'failure'
+      - name: Fail if unit tests or lint failed
+        if: steps.unit-tests.outcome == 'failure' || steps.android-lint.outcome == 'failure'
         run: |
-          echo "::error::JVM unit tests failed. Final Gradle output: $(tail -n 30 gradle-unit-tests.log | tr '\n' ' ')"
+          echo "::error::JVM unit tests: ${{ steps.unit-tests.outcome }}. Lint: ${{ steps.android-lint.outcome }}. Lint output: $(tail -n 60 gradle-lint.log | tr '\n' ' ')"
           exit 1
 
   instrumented:

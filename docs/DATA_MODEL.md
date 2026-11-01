@@ -279,3 +279,26 @@ prevents duplicate types while allowing future types to be added.
 
 The shooting database has its own Room schema version and does not alter the
 existing `MetraDatabase` version or its migration chain.
+
+
+## Combined activity reporting
+
+The combined report reads trench work records from `metra2.db` and shooting
+daily reports from `shooting.db`. It keeps trench meters and shooting meters
+as separate totals and displays their daily rows together for a selected date
+range. It also summarizes company expenses, settled amounts and the remaining
+reimbursable balance.
+
+## Company expenses and settlements
+
+`company_expenses` stores project costs independently of either activity.
+Each expense records its date, activity scope (general, trench or shooting),
+category, amount, description and optional receipt reference.
+`expense_settlements` stores dated partial or full repayments. The outstanding
+amount is derived as expense amount minus the sum of its settlement rows; a
+settlement that exceeds the remaining balance is rejected.
+
+Both tables use the separate shooting database migration from version 1 to 2.
+Backup format version 4 includes shooting reports and operations, company
+expenses and every partial settlement; restore maps report and expense links
+without changing the existing trench database schema.

@@ -248,3 +248,34 @@ local mirror of reminder scheduling.
   schema change without a migration fails loudly rather than wiping user data.
 - Future migrations must be additive and must never rewrite
   `threshold_meters_snapshot` or `rate_per_meter_snapshot`.
+
+
+---
+
+## Fiber shooting (separate database)
+
+Fiber-shooting records are stored in `shooting.db`, independently of
+`metra2.db`. This separation is intentional: the existing trench schema and
+its migrations remain unchanged.
+
+### `shooting_reports`
+
+Daily header fields: project id and project-name snapshot, epoch-day date,
+work area, employer, supervisor, worker count (default zero), notes, calculated
+daily meters, and creation/update timestamps.
+
+### `shooting_operations`
+
+Each report can contain multiple cable routes. An operation stores start/end
+point types and codes, the printed cable-meter readings, cable type id, and
+calculated route length. Route length is always
+`ABS(end_meter - start_meter)`; decreasing cable-counter readings are valid.
+
+### `cable_types`
+
+Cable types are maintained independently and keyed by core count. The initial
+catalog seeds 6, 12, 24, 48, 96 and 144 cores. The unique core-count index
+prevents duplicate types while allowing future types to be added.
+
+The shooting database has its own Room schema version and does not alter the
+existing `MetraDatabase` version or its migration chain.

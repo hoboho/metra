@@ -65,6 +65,8 @@ interface ShootingDao {
     suspend fun insertOperations(items: List<ShootingOperationEntity>)
     @Query("DELETE FROM shooting_reports WHERE id = :id")
     suspend fun deleteReport(id: Long)
+    @Query("DELETE FROM shooting_reports")
+    suspend fun deleteAllShootingReports()
     @Query("SELECT * FROM shooting_reports WHERE work_date_epoch_day BETWEEN :start AND :end ORDER BY work_date_epoch_day")
     suspend fun reportsInRange(start: Long, end: Long): List<ShootingReportEntity>
     @Query("SELECT COALESCE(SUM(total_meters), 0) FROM shooting_reports WHERE work_date_epoch_day BETWEEN :start AND :end")

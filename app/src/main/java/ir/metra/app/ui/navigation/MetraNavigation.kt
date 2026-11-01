@@ -45,6 +45,8 @@ import ir.metra.app.feature.settings.SettingsScreen
 import ir.metra.app.feature.statistics.StatisticsScreen
 import ir.metra.app.feature.statistics.YearlyOverviewScreen
 import ir.metra.app.feature.shooting.ShootingScreen
+import ir.metra.app.feature.shooting.CombinedReportScreen
+import ir.metra.app.feature.shooting.CompanyExpensesScreen
 import ir.metra.app.feature.work.WorkEditorScreen
 import ir.metra.app.feature.work.WorkLogScreen
 import kotlinx.serialization.Serializable
@@ -70,6 +72,12 @@ data class LedgerEditorArgs(val entryId: Long = 0L)
 
 @Serializable
 data object StatisticsRoute
+
+@Serializable
+data object CombinedReportsRoute
+
+@Serializable
+data object CompanyExpensesRoute
 
 @Serializable
 data object ShootingRoute
@@ -146,7 +154,7 @@ fun MetraNavHost(
             )
         }
         composable<ReportsRoute> {
-            ReportsScreen(onOpenProjects = { navController.navigate(ProjectsRoute) })
+            ReportsScreen(onOpenProjects = { navController.navigate(ProjectsRoute) }, onOpenCombinedReport = { navController.navigate(CombinedReportsRoute) }, onOpenCompanyExpenses = { navController.navigate(CompanyExpensesRoute) })
         }
         composable<LedgerRoute> {
             LedgerScreen(
@@ -163,6 +171,8 @@ fun MetraNavHost(
             )
         }
         composable<ShootingRoute> { ShootingScreen() }
+        composable<CombinedReportsRoute> { CombinedReportScreen() }
+        composable<CompanyExpensesRoute> { CompanyExpensesScreen() }
         composable<SettingsRoute> {
             SettingsScreen(
                 onOpenProjects = { navController.navigate(ProjectsRoute) },

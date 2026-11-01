@@ -212,7 +212,7 @@ class BackupManager @Inject constructor(
                 encrypted = !passphrase.isNullOrBlank(),
                 projectCount = payload.projects.size,
                 workRecordCount = payload.workRecords.size,
-                expenseCount = payload.expenses.size,
+                expenseCount = payload.expenses.size + payload.companyExpenses.size,
                 sha256 = sha256(bytes),
             ),
         )
@@ -242,7 +242,7 @@ class BackupManager @Inject constructor(
                 appVersionName = payload.appVersionName,
                 incomingProjects = payload.projects.size,
                 incomingWorkRecords = payload.workRecords.size,
-                incomingExpenses = payload.expenses.size,
+                incomingExpenses = payload.expenses.size + payload.companyExpenses.size,
                 incomingPaymentRules = payload.paymentRules.size,
                 existingProjects = existingProjects,
                 existingWorkRecords = existingRecords,
@@ -513,6 +513,7 @@ class BackupManager @Inject constructor(
         val existingCompanyExpenses = shootingRepository.allCompanyExpenses()
         fun companyExpenseKey(e: CompanyExpenseEntity) = listOf(e.projectName, e.expenseDateEpochDay, e.activity, e.category, e.amount, e.description, e.receiptReference).joinToString("|")
         val companyExpenseByKey = existingCompanyExpenses.associateBy(::companyExpenseKey).toMutableMap()
+        var companyExpensesImported = 0
         val importedExpenseIds = LongArray(payload.companyExpenses.size)
         for ((index, dto) in payload.companyExpenses.withIndex()) {
             val incoming = CompanyExpenseEntity(
@@ -524,8 +525,12 @@ class BackupManager @Inject constructor(
             val existing = companyExpenseByKey[companyExpenseKey(incoming)]
             val id = existing?.id ?: shootingRepository.importCompanyExpense(incoming)
             importedExpenseIds[index] = id
-            if (existing == null) companyExpenseByKey[companyExpenseKey(incoming)] = incoming.copy(id = id)
+            if (existing == null) {
+                companyExpenseByKey[companyExpenseKey(incoming)] = incoming.copy(id = id)
+                companyExpensesImported++
+            }
         }
+        expensesImported += companyExpensesImported
         val knownSettlements = shootingRepository.allExpenseSettlements().map {
             listOf(it.expenseId, it.settlementDateEpochDay, it.amount, it.notes).joinToString("|")
         }.toMutableSet()

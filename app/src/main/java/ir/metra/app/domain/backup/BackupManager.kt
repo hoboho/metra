@@ -555,7 +555,7 @@ class BackupManager @Inject constructor(
                 encrypted = !passphrase.isNullOrBlank(),
                 projectCount = payload.projects.size,
                 workRecordCount = payload.workRecords.size,
-                expenseCount = payload.expenses.size,
+                expenseCount = payload.expenses.size + payload.companyExpenses.size,
                 sha256 = sha256(sourceFile.readBytes()),
                 safetySnapshotPath = snapshotPath,
             ),

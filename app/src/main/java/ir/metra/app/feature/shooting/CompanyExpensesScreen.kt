@@ -13,6 +13,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ir.metra.app.core.format.NumberFormatter
 import ir.metra.app.core.date.JalaliCalendar
+import ir.metra.app.core.format.DateFormatter
+import ir.metra.app.ui.components.JalaliDatePickerDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -21,6 +23,7 @@ fun CompanyExpensesScreen(viewModel: CompanyExpenseViewModel = hiltViewModel()) 
     var projectMenu by remember { mutableStateOf(false) }
     var activityMenu by remember { mutableStateOf(false) }
     var categoryMenu by remember { mutableStateOf(false) }
+    var showDatePicker by remember { mutableStateOf(false) }
     LazyColumn(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
         item {
             Text("ثبت هزینه‌های قابل تسویه", style = MaterialTheme.typography.titleLarge)
@@ -36,6 +39,7 @@ fun CompanyExpensesScreen(viewModel: CompanyExpenseViewModel = hiltViewModel()) 
                 OutlinedTextField(s.category, {}, readOnly = true, label = { Text("دسته هزینه") }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(categoryMenu) }, modifier = Modifier.menuAnchor().fillMaxWidth())
                 ExposedDropdownMenu(categoryMenu, { categoryMenu = false }) { listOf("سوخت خودرو", "سوخت دستگاه", "مخارج خودرو", "مخارج دستگاه", "اقلام مصرفی", "خورد و خوراک", "هزینه‌های بدون فاکتور").forEach { v -> DropdownMenuItem(text = { Text(v) }, onClick = { viewModel.update { it.copy(category = v) }; categoryMenu = false }) } }
             }
+            OutlinedButton(onClick = { showDatePicker = true }, modifier = Modifier.fillMaxWidth()) { Text("تاریخ هزینه: " + DateFormatter().format(s.date)) }
             OutlinedTextField(s.amount, { v -> viewModel.update { it.copy(amount = v.filter(Char::isDigit)) } }, label = { Text("مبلغ (تومان)") }, modifier = Modifier.fillMaxWidth())
             OutlinedTextField(s.description, { v -> viewModel.update { it.copy(description = v) } }, label = { Text("توضیحات") }, modifier = Modifier.fillMaxWidth())
             OutlinedTextField(s.receiptReference, { v -> viewModel.update { it.copy(receiptReference = v) } }, label = { Text("مرجع رسید (اختیاری)") }, modifier = Modifier.fillMaxWidth())
@@ -62,4 +66,5 @@ fun CompanyExpensesScreen(viewModel: CompanyExpenseViewModel = hiltViewModel()) 
             }
         }
     }
+    if (showDatePicker) JalaliDatePickerDialog(s.date, { showDatePicker = false }) { selected -> viewModel.update { it.copy(date = selected) } }
 }

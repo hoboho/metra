@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -22,6 +23,7 @@ import ir.metra.app.ui.components.MetraButton
 import ir.metra.app.ui.components.MetraButtonLevel
 import ir.metra.app.ui.components.SectionCard
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoreScreen(
     onOpenStatistics: () -> Unit,

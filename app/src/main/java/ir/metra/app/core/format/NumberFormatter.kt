@@ -42,6 +42,9 @@ class NumberFormatter @Inject constructor() {
     fun formatMetersValue(meters: Int): String =
         PersianDigits.toPersian(integerFormat.format(meters))
 
+    /** Long-valued meters, used by aggregated reports that may exceed Int range. */
+    fun formatMetersValue(meters: Long): String = formatPersian(meters)
+
     /** Money with the Toman suffix, e.g. "۱٬۸۰۰٬۰۰۰ تومان". */
     fun formatToman(amount: Long): String = "${formatPersian(amount)} $TomanUnit"
 

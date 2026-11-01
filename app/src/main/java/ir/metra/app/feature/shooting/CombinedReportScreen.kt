@@ -38,6 +38,11 @@ fun CombinedReportScreen(viewModel: CombinedReportViewModel = hiltViewModel()) {
                 Text("شوتینگ", style = MaterialTheme.typography.titleMedium)
                 Text("گزارش‌های ثبت‌شده: " + s.shooting.size)
                 Text("متراژ شوتینگ: " + NumberFormatter().formatPersian(s.shootingMeters) + " متر")
+                HorizontalDivider()
+                Text("هزینه‌های قابل تسویه شرکت", style = MaterialTheme.typography.titleMedium)
+                Text("کل هزینه‌ها: " + NumberFormatter().formatToman(s.companyExpenseTotal))
+                Text("تسویه‌شده: " + NumberFormatter().formatToman(s.companyExpenseSettled))
+                Text("مانده قابل تسویه: " + NumberFormatter().formatToman(s.companyExpenseOutstanding))
             }
         }
         Text("گزارش‌های روزانه", style = MaterialTheme.typography.titleMedium)

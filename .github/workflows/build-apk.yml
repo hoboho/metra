@@ -51,14 +51,19 @@ jobs:
           ./gradlew :app:lintDebug --no-daemon --stacktrace --console=plain 2>&1 | tee gradle-lint.log
 
       - name: Assemble installable debug APK
-        run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
+        id: apk-build
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          ./gradlew :app:assembleDebug --no-daemon --stacktrace --console=plain 2>&1 | tee gradle-apk-build.log
 
       - name: Upload APK
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: metra-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
+          if-no-files-found: ignore
           retention-days: 14
 
       - name: Upload unit test and lint reports
@@ -69,6 +74,7 @@ jobs:
           path: |
             gradle-unit-tests.log
             gradle-lint.log
+            gradle-apk-build.log
             app/build/reports/tests/
             app/build/reports/lint-results-debug.html
           if-no-files-found: ignore
@@ -89,11 +95,17 @@ jobs:
             if [ -f gradle-lint.log ]; then tail -n 120 gradle-lint.log; else echo 'No lint log was produced.'; fi
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo '### APK build output (last 120 lines)'
+            echo '```text'
+            if [ -f gradle-apk-build.log ]; then tail -n 120 gradle-apk-build.log; else echo 'No APK build log was produced.'; fi
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Fail if unit tests or lint failed
-        if: steps.unit-tests.outcome == 'failure' || steps.android-lint.outcome == 'failure'
+      - name: Fail if unit tests, lint, or APK build failed
+        if: steps.unit-tests.outcome == 'failure' || steps.android-lint.outcome == 'failure' || steps.apk-build.outcome == 'failure'
         run: |
-          echo "::error::JVM unit tests: ${{ steps.unit-tests.outcome }}. Lint: ${{ steps.android-lint.outcome }}. Lint output: $(tail -n 60 gradle-lint.log | tr '\n' ' ')"
+          echo "::error::JVM unit tests: ${{ steps.unit-tests.outcome }}. Lint: ${{ steps.android-lint.outcome }}. APK build: ${{ steps.apk-build.outcome }}. APK build output: $(tail -n 60 gradle-apk-build.log | tr '\n' ' ')"
           exit 1
 
   instrumented:
